@@ -1,16 +1,29 @@
-# Binaries (root level only)
+# Binaries (at repo root only)
 /epack-collector-email-dns
 /epack-collector-email-dns-*
+
+# Build artifacts
+/bin/
 *.exe
+*.dll
+*.so
+*.dylib
 
 # Test artifacts
 *.test
-coverage.out
+*.out
+coverage.txt
 
 # IDE
 .idea/
 .vscode/
 *.swp
+*.swo
 
 # OS
 .DS_Store
+Thumbs.db
+
+# Go workspace
+go.work
+go.work.sum

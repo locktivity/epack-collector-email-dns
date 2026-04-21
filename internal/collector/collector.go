@@ -330,6 +330,11 @@ func isAlpha(c byte) bool {
 	return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z')
 }
 
+// isDigit returns true if c is an ASCII digit.
+func isDigit(c byte) bool {
+	return c >= '0' && c <= '9'
+}
+
 // isValidSPFName checks if s is a valid SPF name per RFC 7208 §12.
 // name = ALPHA *( ALPHA / DIGIT / "-" / "_" / "." )
 func isValidSPFName(s string) bool {
@@ -338,7 +343,7 @@ func isValidSPFName(s string) bool {
 	}
 	for i := 0; i < len(s); i++ {
 		c := s[i]
-		if !isAlpha(c) && !(c >= '0' && c <= '9') && c != '-' && c != '_' && c != '.' {
+		if !isAlpha(c) && !isDigit(c) && c != '-' && c != '_' && c != '.' {
 			return false
 		}
 	}

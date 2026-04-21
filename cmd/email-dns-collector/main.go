@@ -46,8 +46,9 @@ func run(ctx componentsdk.CollectorContext) error {
 
 	return ctx.Emit([]componentsdk.CollectedArtifact{
 		{
-			Data: posture,
-			Path: "artifacts/email-dns.json",
+			Data:   posture,
+			Path:   "artifacts/email-dns.json",
+			Schema: "evidencepack/email-dns@v1",
 		},
 	})
 }

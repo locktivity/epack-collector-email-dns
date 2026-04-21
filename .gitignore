@@ -1,0 +1,16 @@
+# Binaries (root level only)
+/epack-collector-email-dns
+/epack-collector-email-dns-*
+*.exe
+
+# Test artifacts
+*.test
+coverage.out
+
+# IDE
+.idea/
+.vscode/
+*.swp
+
+# OS
+.DS_Store

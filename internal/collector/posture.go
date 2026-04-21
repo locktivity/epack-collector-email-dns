@@ -22,6 +22,16 @@ type EmailDNSPosture struct {
 
 	// Summary statistics
 	Summary Summary `json:"summary"`
+
+	// Diagnostics contains warnings and errors encountered during collection
+	Diagnostics *Diagnostics `json:"diagnostics,omitempty"`
+}
+
+// Diagnostics contains warnings and errors encountered during collection.
+// This helps identify DNS resolution issues vs domains that genuinely lack records.
+type Diagnostics struct {
+	DomainErrors []string `json:"domain_errors,omitempty"`
+	Warnings     []string `json:"warnings,omitempty"`
 }
 
 // DomainResult contains all email DNS records for a single domain.
@@ -89,18 +99,13 @@ type DKIMRecord struct {
 
 // Summary contains aggregate statistics across all domains.
 type Summary struct {
-	TotalDomains int `json:"total_domains"`
-	WithMX       int `json:"with_mx"`
-	WithSPF      int `json:"with_spf"`
-	WithDMARC    int `json:"with_dmarc"`
-	WithDKIM     int `json:"with_dkim"`
-	WithAllThree int `json:"with_all_three"` // MX + SPF + DMARC
-	ErrorCount   int `json:"error_count"`
-
-	// Enforcement metrics
-	Enforced        int  `json:"enforced"`          // domains with DMARC p=reject
-	WithReporting   int  `json:"with_reporting"`    // domains with rua configured
-	AllEnforced     bool `json:"all_enforced"`      // true if all domains have p=reject
-	EnforcedPct     int  `json:"enforced_pct"`      // percentage of domains enforced
-	WithReportingPct int `json:"with_reporting_pct"` // percentage with reporting
+	TotalDomains     int  `json:"total_domains"`
+	WithMxPct        int  `json:"with_mx_pct"`
+	WithSpfPct       int  `json:"with_spf_pct"`
+	WithDmarcPct     int  `json:"with_dmarc_pct"`
+	WithDkimPct      int  `json:"with_dkim_pct"`
+	WithAllThreePct  int  `json:"with_all_three_pct"` // MX + SPF + DMARC
+	EnforcedPct      int  `json:"enforced_pct"`       // percentage with DMARC p=reject
+	WithReportingPct int  `json:"with_reporting_pct"` // percentage with rua configured
+	AllEnforced      bool `json:"all_enforced"`       // true if all domains have p=reject
 }

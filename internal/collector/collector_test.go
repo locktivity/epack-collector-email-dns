@@ -250,17 +250,17 @@ func TestComputeAssessment(t *testing.T) {
 func TestComputeSummary(t *testing.T) {
 	domains := []DomainResult{
 		{
-			MX:   []MXRecord{{Host: "mail.example.com"}},
-			SPF:  &SPFRecord{Valid: true},
+			MX:    []MXRecord{{Host: "mail.example.com"}},
+			SPF:   &SPFRecord{Valid: true},
 			DMARC: &DMARCRecord{Policy: "reject", Pct: 100},
-			DKIM: []DKIMRecord{{Valid: true}},
+			DKIM:  []DKIMRecord{{Valid: true}},
 			Assessment: Assessment{Enforced: true, HasReporting: true},
 		},
 		{
-			MX:   []MXRecord{},
-			SPF:  nil,
+			MX:    []MXRecord{},
+			SPF:   nil,
 			DMARC: nil,
-			DKIM: []DKIMRecord{},
+			DKIM:  []DKIMRecord{},
 			Assessment: Assessment{Enforced: false, HasReporting: false},
 		},
 	}
@@ -270,16 +270,49 @@ func TestComputeSummary(t *testing.T) {
 	if summary.TotalDomains != 2 {
 		t.Errorf("TotalDomains = %d, want 2", summary.TotalDomains)
 	}
-	if summary.WithMX != 1 {
-		t.Errorf("WithMX = %d, want 1", summary.WithMX)
+	if summary.WithMxPct != 50 {
+		t.Errorf("WithMxPct = %d, want 50", summary.WithMxPct)
 	}
-	if summary.Enforced != 1 {
-		t.Errorf("Enforced = %d, want 1", summary.Enforced)
+	if summary.WithSpfPct != 50 {
+		t.Errorf("WithSpfPct = %d, want 50", summary.WithSpfPct)
+	}
+	if summary.WithDmarcPct != 50 {
+		t.Errorf("WithDmarcPct = %d, want 50", summary.WithDmarcPct)
+	}
+	if summary.WithDkimPct != 50 {
+		t.Errorf("WithDkimPct = %d, want 50", summary.WithDkimPct)
+	}
+	if summary.EnforcedPct != 50 {
+		t.Errorf("EnforcedPct = %d, want 50", summary.EnforcedPct)
+	}
+	if summary.WithReportingPct != 50 {
+		t.Errorf("WithReportingPct = %d, want 50", summary.WithReportingPct)
 	}
 	if summary.AllEnforced != false {
 		t.Errorf("AllEnforced = %v, want false", summary.AllEnforced)
 	}
-	if summary.EnforcedPct != 50 {
-		t.Errorf("EnforcedPct = %d, want 50", summary.EnforcedPct)
+}
+
+func TestComputeDiagnostics(t *testing.T) {
+	// No errors - should return nil
+	domains := []DomainResult{
+		{Domain: "example.com"},
+	}
+	diag := computeDiagnostics(domains)
+	if diag != nil {
+		t.Error("Expected nil diagnostics when no errors")
+	}
+
+	// With errors - should return diagnostics
+	domainsWithErrors := []DomainResult{
+		{Domain: "example.com", Errors: []string{"DNS timeout"}},
+		{Domain: "test.com", Errors: []string{"NXDOMAIN"}},
+	}
+	diag = computeDiagnostics(domainsWithErrors)
+	if diag == nil {
+		t.Fatal("Expected non-nil diagnostics when errors present")
+	}
+	if len(diag.DomainErrors) != 2 {
+		t.Errorf("DomainErrors count = %d, want 2", len(diag.DomainErrors))
 	}
 }

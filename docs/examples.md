@@ -113,17 +113,14 @@ collectors:
     ],
     "summary": {
       "total_domains": 2,
-      "with_mx": 1,
-      "with_spf": 2,
-      "with_dmarc": 2,
-      "with_dkim": 1,
-      "with_all_three": 1,
-      "error_count": 0,
-      "enforced": 2,
-      "with_reporting": 1,
-      "all_enforced": true,
+      "with_mx_pct": 50,
+      "with_spf_pct": 100,
+      "with_dmarc_pct": 100,
+      "with_dkim_pct": 50,
+      "with_all_three_pct": 50,
       "enforced_pct": 100,
-      "with_reporting_pct": 50
+      "with_reporting_pct": 50,
+      "all_enforced": true
     }
   }
 }
@@ -145,9 +142,15 @@ Each domain includes an `assessment` object:
 
 | Field | Description |
 |-------|-------------|
+| `total_domains` | Number of domains scanned |
+| `with_mx_pct` | Percentage of domains with MX records |
+| `with_spf_pct` | Percentage of domains with SPF records |
+| `with_dmarc_pct` | Percentage of domains with DMARC records |
+| `with_dkim_pct` | Percentage of domains with DKIM records |
+| `with_all_three_pct` | Percentage with MX + SPF + DMARC |
+| `enforced_pct` | Percentage with DMARC `p=reject` |
+| `with_reporting_pct` | Percentage with aggregate reporting (`rua`) |
 | `all_enforced` | `true` only if ALL domains have `p=reject` |
-| `enforced_pct` | Percentage of domains with enforcement |
-| `with_reporting_pct` | Percentage with aggregate reporting |
 
 ### Pass Criteria
 

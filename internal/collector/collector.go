@@ -59,6 +59,7 @@ func Collect(ctx context.Context, cfg Config) (*EmailDNSPosture, error) {
 	}
 
 	posture.Summary = computeSummary(posture.Domains)
+	posture.Diagnostics = computeDiagnostics(posture.Domains)
 	return posture, nil
 }
 
@@ -468,45 +469,70 @@ func computeAssessment(result *DomainResult) Assessment {
 }
 
 func computeSummary(domains []DomainResult) Summary {
+	total := len(domains)
 	summary := Summary{
-		TotalDomains: len(domains),
+		TotalDomains: total,
 	}
+
+	if total == 0 {
+		return summary
+	}
+
+	var withMX, withSPF, withDMARC, withDKIM, withAllThree, enforced, withReporting int
 
 	for _, d := range domains {
 		if len(d.MX) > 0 {
-			summary.WithMX++
+			withMX++
 		}
 		if d.SPF != nil {
-			summary.WithSPF++
+			withSPF++
 		}
 		if d.DMARC != nil {
-			summary.WithDMARC++
+			withDMARC++
 		}
 		if len(d.DKIM) > 0 {
-			summary.WithDKIM++
+			withDKIM++
 		}
 		if len(d.MX) > 0 && d.SPF != nil && d.DMARC != nil {
-			summary.WithAllThree++
+			withAllThree++
 		}
-		summary.ErrorCount += len(d.Errors)
-
-		// Enforcement metrics
 		if d.Assessment.Enforced {
-			summary.Enforced++
+			enforced++
 		}
 		if d.Assessment.HasReporting {
-			summary.WithReporting++
+			withReporting++
 		}
 	}
 
-	// Compute percentages and all-enforced flag
-	if summary.TotalDomains > 0 {
-		summary.EnforcedPct = (summary.Enforced * 100) / summary.TotalDomains
-		summary.WithReportingPct = (summary.WithReporting * 100) / summary.TotalDomains
-		summary.AllEnforced = summary.Enforced == summary.TotalDomains
-	}
+	// Compute percentages
+	summary.WithMxPct = (withMX * 100) / total
+	summary.WithSpfPct = (withSPF * 100) / total
+	summary.WithDmarcPct = (withDMARC * 100) / total
+	summary.WithDkimPct = (withDKIM * 100) / total
+	summary.WithAllThreePct = (withAllThree * 100) / total
+	summary.EnforcedPct = (enforced * 100) / total
+	summary.WithReportingPct = (withReporting * 100) / total
+	summary.AllEnforced = enforced == total
 
 	return summary
+}
+
+func computeDiagnostics(domains []DomainResult) *Diagnostics {
+	var domainErrors []string
+
+	for _, d := range domains {
+		for _, err := range d.Errors {
+			domainErrors = append(domainErrors, d.Domain+": "+err)
+		}
+	}
+
+	if len(domainErrors) == 0 {
+		return nil
+	}
+
+	return &Diagnostics{
+		DomainErrors: domainErrors,
+	}
 }
 
 func isNotFound(err error) bool {

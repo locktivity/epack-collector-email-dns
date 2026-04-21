@@ -22,6 +22,9 @@
     },
     "summary": {
       "$ref": "#/$defs/Summary"
+    },
+    "diagnostics": {
+      "$ref": "#/$defs/Diagnostics"
     }
   },
   "$defs": {
@@ -179,17 +182,14 @@
       "type": "object",
       "required": [
         "total_domains",
-        "with_mx",
-        "with_spf",
-        "with_dmarc",
-        "with_dkim",
-        "with_all_three",
-        "error_count",
-        "enforced",
-        "with_reporting",
-        "all_enforced",
+        "with_mx_pct",
+        "with_spf_pct",
+        "with_dmarc_pct",
+        "with_dkim_pct",
+        "with_all_three_pct",
         "enforced_pct",
-        "with_reporting_pct"
+        "with_reporting_pct",
+        "all_enforced"
       ],
       "properties": {
         "total_domains": {
@@ -197,61 +197,70 @@
           "minimum": 0,
           "description": "Total number of domains scanned"
         },
-        "with_mx": {
+        "with_mx_pct": {
           "type": "integer",
           "minimum": 0,
-          "description": "Domains with MX records"
+          "maximum": 100,
+          "description": "Percentage of domains with MX records"
         },
-        "with_spf": {
+        "with_spf_pct": {
           "type": "integer",
           "minimum": 0,
-          "description": "Domains with SPF records"
+          "maximum": 100,
+          "description": "Percentage of domains with SPF records"
         },
-        "with_dmarc": {
+        "with_dmarc_pct": {
           "type": "integer",
           "minimum": 0,
-          "description": "Domains with DMARC records"
+          "maximum": 100,
+          "description": "Percentage of domains with DMARC records"
         },
-        "with_dkim": {
+        "with_dkim_pct": {
           "type": "integer",
           "minimum": 0,
-          "description": "Domains with DKIM records found"
+          "maximum": 100,
+          "description": "Percentage of domains with DKIM records"
         },
-        "with_all_three": {
+        "with_all_three_pct": {
           "type": "integer",
           "minimum": 0,
-          "description": "Domains with MX, SPF, and DMARC"
-        },
-        "error_count": {
-          "type": "integer",
-          "minimum": 0,
-          "description": "Total errors across all domains"
-        },
-        "enforced": {
-          "type": "integer",
-          "minimum": 0,
-          "description": "Domains with DMARC p=reject"
-        },
-        "with_reporting": {
-          "type": "integer",
-          "minimum": 0,
-          "description": "Domains with rua configured"
-        },
-        "all_enforced": {
-          "type": "boolean",
-          "description": "True if all domains have p=reject"
+          "maximum": 100,
+          "description": "Percentage of domains with MX, SPF, and DMARC"
         },
         "enforced_pct": {
           "type": "integer",
           "minimum": 0,
           "maximum": 100,
-          "description": "Percentage of domains enforced"
+          "description": "Percentage of domains with DMARC p=reject"
         },
         "with_reporting_pct": {
           "type": "integer",
           "minimum": 0,
           "maximum": 100,
-          "description": "Percentage with reporting configured"
+          "description": "Percentage of domains with rua configured"
+        },
+        "all_enforced": {
+          "type": "boolean",
+          "description": "True if all domains have p=reject"
+        }
+      }
+    },
+    "Diagnostics": {
+      "type": "object",
+      "properties": {
+        "domain_errors": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Errors encountered for specific domains"
+        },
+        "warnings": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Non-fatal warnings"
         }
       }
     }

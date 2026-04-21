@@ -99,9 +99,9 @@ func TestE2E_LiveDNS(t *testing.T) {
 		t.Errorf("Summary.TotalDomains = %d, want 2", posture.Summary.TotalDomains)
 	}
 
-	// At least primary domain should be enforced
-	if posture.Summary.Enforced < 1 {
-		t.Errorf("Summary.Enforced = %d, want >= 1", posture.Summary.Enforced)
+	// At least primary domain should be enforced (50% = 1 of 2)
+	if posture.Summary.EnforcedPct < 50 {
+		t.Errorf("Summary.EnforcedPct = %d, want >= 50", posture.Summary.EnforcedPct)
 	}
 
 	t.Logf("Summary: %+v", posture.Summary)

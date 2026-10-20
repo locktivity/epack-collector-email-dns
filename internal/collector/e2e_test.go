@@ -4,9 +4,12 @@ package collector
 
 import (
 	"context"
+	"net"
 	"os"
 	"testing"
 	"time"
+
+	"github.com/locktivity/epack/componentsdk"
 )
 
 // testDomain returns the domain to use for e2e tests.
@@ -34,14 +37,19 @@ func TestE2E_LiveDNS(t *testing.T) {
 			domain,
 			"doesntexist." + domain,
 		},
+		Resolver: net.DefaultResolver,
+		Recorder: &componentsdk.Recorder{},
+		Now:      time.Now,
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 
-	posture, err := Collect(ctx, cfg)
-	if err != nil {
-		t.Fatalf("Collect failed: %v", err)
+	posture := Collect(ctx, cfg)
+
+	// A name that does not exist is an answer, so every lookup succeeds
+	if gaps := cfg.Recorder.Gaps(); len(gaps) > 0 {
+		t.Errorf("Expected no gaps, got %+v", gaps)
 	}
 
 	// Verify we got results for both domains
@@ -68,23 +76,23 @@ func TestE2E_LiveDNS(t *testing.T) {
 	}
 
 	// Primary domain should have SPF
-	if primary.SPF == nil {
+	if primary.SPF.Record == nil {
 		t.Errorf("%s: expected SPF record", domain)
-	} else if !primary.SPF.Valid {
+	} else if !primary.SPF.Record.Valid {
 		t.Errorf("%s: SPF record should be valid", domain)
 	}
 
 	// Primary domain should have DMARC with p=reject
-	if primary.DMARC == nil {
+	if primary.DMARC.Record == nil {
 		t.Errorf("%s: expected DMARC record", domain)
 	} else {
-		if primary.DMARC.Policy != "reject" {
-			t.Errorf("%s: DMARC policy = %q, want reject", domain, primary.DMARC.Policy)
+		if primary.DMARC.Record.Policy != "reject" {
+			t.Errorf("%s: DMARC policy = %q, want reject", domain, primary.DMARC.Record.Policy)
 		}
-		if !primary.Assessment.Enforced {
+		if primary.Assessment.Enforced == nil || !*primary.Assessment.Enforced {
 			t.Errorf("%s: expected assessment.enforced = true", domain)
 		}
-		if !primary.Assessment.HasReporting {
+		if primary.Assessment.HasReporting == nil || !*primary.Assessment.HasReporting {
 			t.Errorf("%s: expected assessment.has_reporting = true", domain)
 		}
 	}
@@ -100,8 +108,8 @@ func TestE2E_LiveDNS(t *testing.T) {
 	}
 
 	// At least primary domain should be enforced (50% = 1 of 2)
-	if posture.Summary.EnforcedPct < 50 {
-		t.Errorf("Summary.EnforcedPct = %d, want >= 50", posture.Summary.EnforcedPct)
+	if posture.Summary.EnforcedPct == nil || *posture.Summary.EnforcedPct < 50 {
+		t.Errorf("Summary.EnforcedPct = %s, want >= 50", show(posture.Summary.EnforcedPct))
 	}
 
 	t.Logf("Summary: %+v", posture.Summary)
@@ -110,14 +118,13 @@ func TestE2E_LiveDNS(t *testing.T) {
 // TestE2E_ProgressCallbacks verifies progress callbacks are invoked.
 func TestE2E_ProgressCallbacks(t *testing.T) {
 	domain := testDomain()
-	var statusCalls []string
 	var progressCalls []struct{ current, total int64 }
 
 	cfg := Config{
-		Domains: []string{domain},
-		OnStatus: func(s string) {
-			statusCalls = append(statusCalls, s)
-		},
+		Domains:  []string{domain},
+		Resolver: net.DefaultResolver,
+		Recorder: &componentsdk.Recorder{},
+		Now:      time.Now,
 		OnProgress: func(current int64, total int64, message string) {
 			progressCalls = append(progressCalls, struct{ current, total int64 }{current, total})
 		},
@@ -126,14 +133,7 @@ func TestE2E_ProgressCallbacks(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 
-	_, err := Collect(ctx, cfg)
-	if err != nil {
-		t.Fatalf("Collect failed: %v", err)
-	}
-
-	if len(statusCalls) == 0 {
-		t.Error("Expected OnStatus to be called")
-	}
+	Collect(ctx, cfg)
 
 	if len(progressCalls) == 0 {
 		t.Error("Expected OnProgress to be called")

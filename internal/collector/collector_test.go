@@ -1,13 +1,33 @@
 package collector
 
 import (
+	"context"
+	"encoding/json"
+	"fmt"
+	"net"
+	"reflect"
+	"strings"
 	"testing"
+	"time"
+
+	"github.com/locktivity/epack/componentsdk"
 )
+
+func read[T any](record *T) Lookup[T] {
+	return Lookup[T]{Record: record, Read: true}
+}
+
+func show[T any](v *T) string {
+	if v == nil {
+		return "left out"
+	}
+	return fmt.Sprint(*v)
+}
 
 func TestParseDMARC(t *testing.T) {
 	tests := []struct {
-		name     string
-		record   string
+		name       string
+		record     string
 		wantPolicy string
 		wantSP     string
 		wantPct    int
@@ -105,11 +125,11 @@ func TestValidateDMARC(t *testing.T) {
 		{"v=DMARC1; p=reject", true},
 		{"v=DMARC1; p=none; rua=mailto:dmarc@example.com", true},
 		{"v=DMARC1; p=quarantine; sp=reject", true},
-		{"v=DMARC1", false},                       // no policy
-		{"p=reject", false},                        // no version
+		{"v=DMARC1", false}, // no policy
+		{"p=reject", false}, // no version
 		{"not a dmarc record", false},
-		{"v=DMARC1; sp=reject", false},            // sp= without p= is invalid
-		{"v=DMARC1; rua=mailto:x@y.com", false},   // rua without p= is invalid
+		{"v=DMARC1; sp=reject", false},               // sp= without p= is invalid
+		{"v=DMARC1; rua=mailto:x@y.com", false},      // rua without p= is invalid
 		{"v=DMARC1; p=bogus", false},                 // invalid policy value
 		{"v=DMARC1; p=REJECT", true},                 // uppercase should work (case insensitive)
 		{"v=DMARC1; p=invalid; rua=mailto:x", false}, // invalid policy with other valid tags
@@ -145,13 +165,13 @@ func TestValidateDKIM(t *testing.T) {
 	}{
 		{"v=DKIM1; k=rsa; p=MIGfMA0GCSqGSIb3DQEBAQUAA4GN", true},
 		{"p=MIGfMA0GCSqGSIb3DQEBAQUAA4GN", true},
-		{"v=DKIM1; p=;", false},   // empty key
-		{"v=DKIM1; p= ", false},   // whitespace key
-		{"v=DKIM1; k=rsa", false}, // no key
-		{"sp=foo", false},                    // not a DKIM record (would match old p= substring check)
-		{"v=DKIM10; p=key", false},           // wrong version number
-		{"k=rsa; v=DKIM1; p=key", false},     // v= must be first when present per RFC 6376
-		{"p=key; v=DKIM1", false},            // v= not first
+		{"v=DKIM1; p=;", false},          // empty key
+		{"v=DKIM1; p= ", false},          // whitespace key
+		{"v=DKIM1; k=rsa", false},        // no key
+		{"sp=foo", false},                // not a DKIM record (would match old p= substring check)
+		{"v=DKIM10; p=key", false},       // wrong version number
+		{"k=rsa; v=DKIM1; p=key", false}, // v= must be first when present per RFC 6376
+		{"p=key; v=DKIM1", false},        // v= not first
 	}
 
 	for _, tt := range tests {
@@ -164,132 +184,194 @@ func TestValidateDKIM(t *testing.T) {
 }
 
 func TestComputeAssessment(t *testing.T) {
+	enforcing := func() Lookup[DMARCRecord] {
+		return read(&DMARCRecord{
+			Policy:          "reject",
+			SubdomainPolicy: "reject",
+			Pct:             100,
+			RUA:             "mailto:dmarc@example.com",
+			Valid:           true,
+		})
+	}
 	tests := []struct {
-		name         string
-		result       DomainResult
-		wantEnforced bool
-		wantReporting bool
-		wantIssues   int
+		name          string
+		result        DomainResult
+		dkimFailed    bool
+		wantEnforced  *bool
+		wantReporting *bool
+		wantIssues    *int
 	}{
 		{
 			name: "fully compliant",
 			result: DomainResult{
-				SPF: &SPFRecord{Valid: true},
-				DMARC: &DMARCRecord{
-					Policy:          "reject",
-					SubdomainPolicy: "reject",
-					Pct:             100,
-					RUA:             "mailto:dmarc@example.com",
-					Valid:           true,
-				},
-				DKIM: []DKIMRecord{{Valid: true}},
+				SPF:   read(&SPFRecord{Valid: true}),
+				DMARC: enforcing(),
+				DKIM:  []DKIMRecord{{Valid: true}},
 			},
-			wantEnforced:  true,
-			wantReporting: true,
-			wantIssues:    0,
+			wantEnforced:  new(true),
+			wantReporting: new(true),
+			wantIssues:    new(0),
 		},
 		{
 			name: "no records",
-			result: DomainResult{},
-			wantEnforced:  false,
-			wantReporting: false,
-			wantIssues:    3, // no SPF, no DMARC, no DKIM
+			result: DomainResult{
+				SPF:   read[SPFRecord](nil),
+				DMARC: read[DMARCRecord](nil),
+				DKIM:  []DKIMRecord{},
+			},
+			wantEnforced:  new(false),
+			wantReporting: new(false),
+			wantIssues:    new(3), // no SPF, no DMARC, no DKIM
 		},
 		{
 			name: "monitoring only",
 			result: DomainResult{
-				SPF: &SPFRecord{Valid: true},
-				DMARC: &DMARCRecord{
+				SPF: read(&SPFRecord{Valid: true}),
+				DMARC: read(&DMARCRecord{
 					Policy:          "none",
 					SubdomainPolicy: "none",
 					Pct:             100,
 					Valid:           true,
-				},
+				}),
 				DKIM: []DKIMRecord{{Valid: true}},
 			},
-			wantEnforced:  false,
-			wantReporting: false,
-			wantIssues:    3, // policy none, no reporting, subdomain not reject
+			wantEnforced:  new(false),
+			wantReporting: new(false),
+			wantIssues:    new(3), // policy none, no reporting, subdomain not reject
 		},
 		{
 			name: "enforced with invalid sp",
 			result: DomainResult{
-				SPF: &SPFRecord{Valid: true},
-				DMARC: &DMARCRecord{
+				SPF: read(&SPFRecord{Valid: true}),
+				DMARC: read(&DMARCRecord{
 					Record:          "v=DMARC1; p=reject; sp=bogus; rua=mailto:x@example.com",
 					Policy:          "reject",
 					SubdomainPolicy: "reject", // falls back to p= when sp= is invalid
 					Pct:             100,
 					RUA:             "mailto:x@example.com",
 					Valid:           true,
-				},
+				}),
 				DKIM: []DKIMRecord{{Valid: true}},
 			},
-			wantEnforced:  true,
-			wantReporting: true,
-			wantIssues:    1, // invalid sp= reported as issue
+			wantEnforced:  new(true),
+			wantReporting: new(true),
+			wantIssues:    new(1), // invalid sp= reported as issue
+		},
+		{
+			name: "SPF lookup failed",
+			result: DomainResult{
+				DMARC: enforcing(),
+				DKIM:  []DKIMRecord{{Valid: true}},
+			},
+			wantEnforced:  new(true),
+			wantReporting: new(true),
+		},
+		{
+			name: "DMARC lookup failed",
+			result: DomainResult{
+				SPF:  read(&SPFRecord{Valid: true}),
+				DKIM: []DKIMRecord{{Valid: true}},
+			},
+		},
+		{
+			name: "every DKIM lookup failed",
+			result: DomainResult{
+				SPF:   read(&SPFRecord{Valid: true}),
+				DMARC: enforcing(),
+			},
+			dkimFailed:    true,
+			wantEnforced:  new(true),
+			wantReporting: new(true),
+		},
+		{
+			name: "a DKIM lookup failed and another returned a valid key",
+			result: DomainResult{
+				SPF:   read(&SPFRecord{Valid: true}),
+				DMARC: enforcing(),
+				DKIM:  []DKIMRecord{{Valid: false}, {Valid: true}},
+			},
+			dkimFailed:    true,
+			wantEnforced:  new(true),
+			wantReporting: new(true),
+			wantIssues:    new(0),
+		},
+		{
+			name: "a DKIM lookup failed and another returned a revoked key",
+			result: DomainResult{
+				SPF:   read(&SPFRecord{Valid: true}),
+				DMARC: enforcing(),
+				DKIM:  []DKIMRecord{{Valid: false}},
+			},
+			dkimFailed:    true,
+			wantEnforced:  new(true),
+			wantReporting: new(true),
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := computeAssessment(&tt.result)
-			if got.Enforced != tt.wantEnforced {
-				t.Errorf("Enforced = %v, want %v", got.Enforced, tt.wantEnforced)
+			got := computeAssessment(&tt.result, !tt.dkimFailed)
+			if !reflect.DeepEqual(got.Enforced, tt.wantEnforced) {
+				t.Errorf("Enforced = %v, want %v", show(got.Enforced), show(tt.wantEnforced))
 			}
-			if got.HasReporting != tt.wantReporting {
-				t.Errorf("HasReporting = %v, want %v", got.HasReporting, tt.wantReporting)
+			if !reflect.DeepEqual(got.HasReporting, tt.wantReporting) {
+				t.Errorf("HasReporting = %v, want %v", show(got.HasReporting), show(tt.wantReporting))
 			}
-			if len(got.Issues) != tt.wantIssues {
-				t.Errorf("len(Issues) = %d, want %d; issues: %v", len(got.Issues), tt.wantIssues, got.Issues)
+			switch {
+			case tt.wantIssues == nil && got.Issues != nil:
+				t.Errorf("Issues = %v, want them left out", got.Issues)
+			case tt.wantIssues != nil && (got.Issues == nil || len(got.Issues) != *tt.wantIssues):
+				t.Errorf("len(Issues) = %d, want %d; issues: %v", len(got.Issues), *tt.wantIssues, got.Issues)
 			}
 		})
 	}
 }
 
-func TestComputeSummary(t *testing.T) {
-	domains := []DomainResult{
-		{
-			MX:    []MXRecord{{Host: "mail.example.com"}},
-			SPF:   &SPFRecord{Valid: true},
-			DMARC: &DMARCRecord{Policy: "reject", Pct: 100},
-			DKIM:  []DKIMRecord{{Valid: true}},
-			Assessment: Assessment{Enforced: true, HasReporting: true},
-		},
-		{
-			MX:    []MXRecord{},
-			SPF:   nil,
-			DMARC: nil,
-			DKIM:  []DKIMRecord{},
-			Assessment: Assessment{Enforced: false, HasReporting: false},
-		},
+func TestSummarize(t *testing.T) {
+	scans := []domainScan{
+		{result: DomainResult{
+			MX:         []MXRecord{{Host: "mail.example.com"}},
+			SPF:        read(&SPFRecord{Valid: true}),
+			DMARC:      read(&DMARCRecord{Policy: "reject", Pct: 100}),
+			DKIM:       []DKIMRecord{{Valid: true}},
+			Assessment: Assessment{Enforced: new(true), HasReporting: new(true)},
+		}},
+		{result: DomainResult{
+			MX:         []MXRecord{},
+			SPF:        read[SPFRecord](nil),
+			DMARC:      read[DMARCRecord](nil),
+			DKIM:       []DKIMRecord{},
+			Assessment: Assessment{Enforced: new(false), HasReporting: new(false)},
+		}},
 	}
 
-	summary := computeSummary(domains)
+	rec := &componentsdk.Recorder{}
+	s := scanner{rec: rec}
+	summary := s.summarize(scans)
 
-	if summary.TotalDomains != 2 {
-		t.Errorf("TotalDomains = %d, want 2", summary.TotalDomains)
+	want := Summary{
+		TotalDomains:       2,
+		WithMxCount:        new(1),
+		WithMxPct:          new(50),
+		WithSpfCount:       new(1),
+		WithSpfPct:         new(50),
+		WithDmarcCount:     new(1),
+		WithDmarcPct:       new(50),
+		WithDkimCount:      new(1),
+		WithDkimPct:        new(50),
+		WithAllThreeCount:  new(1),
+		WithAllThreePct:    new(50),
+		EnforcedCount:      new(1),
+		EnforcedPct:        new(50),
+		WithReportingCount: new(1),
+		WithReportingPct:   new(50),
+		AllEnforced:        new(false),
 	}
-	if summary.WithMxPct != 50 {
-		t.Errorf("WithMxPct = %d, want 50", summary.WithMxPct)
+	if !reflect.DeepEqual(summary, want) {
+		t.Errorf("summary = %+v, want %+v", summary, want)
 	}
-	if summary.WithSpfPct != 50 {
-		t.Errorf("WithSpfPct = %d, want 50", summary.WithSpfPct)
-	}
-	if summary.WithDmarcPct != 50 {
-		t.Errorf("WithDmarcPct = %d, want 50", summary.WithDmarcPct)
-	}
-	if summary.WithDkimPct != 50 {
-		t.Errorf("WithDkimPct = %d, want 50", summary.WithDkimPct)
-	}
-	if summary.EnforcedPct != 50 {
-		t.Errorf("EnforcedPct = %d, want 50", summary.EnforcedPct)
-	}
-	if summary.WithReportingPct != 50 {
-		t.Errorf("WithReportingPct = %d, want 50", summary.WithReportingPct)
-	}
-	if summary.AllEnforced != false {
-		t.Errorf("AllEnforced = %v, want false", summary.AllEnforced)
+	if gaps := rec.Gaps(); len(gaps) != 0 {
+		t.Errorf("gaps = %+v, want none", gaps)
 	}
 }
 
@@ -314,5 +396,115 @@ func TestComputeDiagnostics(t *testing.T) {
 	}
 	if len(diag.DomainErrors) != 2 {
 		t.Errorf("DomainErrors count = %d, want 2", len(diag.DomainErrors))
+	}
+}
+
+func TestDomainResultLeavesOutFailedLookups(t *testing.T) {
+	tests := []struct {
+		name   string
+		result DomainResult
+		want   string
+	}{
+		{
+			name:   "every lookup failed",
+			result: DomainResult{Domain: "example.com"},
+			want:   `{"domain":"example.com","assessment":{}}`,
+		},
+		{
+			name: "no records",
+			result: DomainResult{
+				Domain:     "example.com",
+				MX:         []MXRecord{},
+				SPF:        read[SPFRecord](nil),
+				DMARC:      read[DMARCRecord](nil),
+				DKIM:       []DKIMRecord{},
+				Assessment: Assessment{Enforced: new(false), HasReporting: new(false), Issues: []string{}},
+			},
+			want: `{"domain":"example.com","mx":[],"spf":null,"dmarc":null,"dkim":[],"assessment":{"enforced":false,"has_reporting":false,"issues":[]}}`,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := json.Marshal(tt.result)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if string(got) != tt.want {
+				t.Errorf("JSON = %s, want %s", got, tt.want)
+			}
+		})
+	}
+}
+
+// expiredResolver fails each lookup the way net.Resolver does once the
+// context's deadline has passed.
+type expiredResolver struct{}
+
+func (expiredResolver) LookupTXT(ctx context.Context, name string) ([]string, error) {
+	return nil, &net.DNSError{Err: "i/o timeout", Name: name, IsTimeout: true, UnwrapErr: ctx.Err()}
+}
+
+func (expiredResolver) LookupMX(ctx context.Context, name string) ([]*net.MX, error) {
+	return nil, &net.DNSError{Err: "i/o timeout", Name: name, IsTimeout: true, UnwrapErr: ctx.Err()}
+}
+
+func TestCollectKeepsEveryDomainPastTheDeadline(t *testing.T) {
+	ctx, cancel := context.WithDeadline(context.Background(), time.Unix(0, 0))
+	defer cancel()
+	rec := &componentsdk.Recorder{}
+
+	posture := Collect(ctx, Config{
+		Domains:  []string{"example.com", "example.org"},
+		Resolver: expiredResolver{},
+		Recorder: rec,
+		Now:      time.Now,
+	})
+
+	if got := len(posture.Domains); got != 2 {
+		t.Fatalf("got %d domains, want 2", got)
+	}
+	for _, d := range posture.Domains {
+		if d.MX != nil || d.SPF.Read || d.DMARC.Read || d.DKIM != nil || d.Assessment.Enforced != nil || d.Assessment.Issues != nil {
+			t.Errorf("%s kept a value it could not read: %+v", d.Domain, d)
+		}
+	}
+	// Seven values per domain, and seven counts, seven percentages, and
+	// all_enforced in the summary
+	gaps := rec.Gaps()
+	if len(gaps) != 29 {
+		t.Errorf("got %d gaps, want 29", len(gaps))
+	}
+	for _, g := range gaps {
+		if g.Code != componentsdk.CodeTimeout {
+			t.Errorf("gap at %s has code %s, want timeout", g.Pointer, g.Code)
+		}
+	}
+}
+
+func TestSummaryGapsNameTheLineThatLeavesThemOut(t *testing.T) {
+	// share records the gaps, so without Recorder.Helper every summary gap
+	// would name the same line in share.
+	rec := &componentsdk.Recorder{}
+	Collect(context.Background(), Config{
+		Domains:  []string{"example.com"},
+		Resolver: expiredResolver{},
+		Recorder: rec,
+		Now:      time.Now,
+	})
+
+	sources := map[string]string{}
+	for _, g := range rec.Gaps() {
+		if strings.HasPrefix(g.Pointer, "/summary/") && strings.HasSuffix(g.Pointer, "_count") {
+			sources[g.Source] = g.Pointer
+		}
+	}
+	if len(sources) != 7 {
+		t.Errorf("the seven count gaps name %d distinct lines, want one each: %v", len(sources), sources)
+	}
+	for source := range sources {
+		if !strings.HasPrefix(source, "internal/collector/collector.go:") {
+			t.Errorf("source %q is not a line in collector.go", source)
+		}
 	}
 }

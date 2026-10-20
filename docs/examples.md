@@ -84,7 +84,8 @@ collectors:
         ],
         "assessment": {
           "enforced": true,
-          "has_reporting": true
+          "has_reporting": true,
+          "issues": []
         }
       },
       {
@@ -101,6 +102,7 @@ collectors:
           "pct": 100,
           "valid": true
         },
+        "dkim": [],
         "assessment": {
           "enforced": true,
           "has_reporting": false,
@@ -113,12 +115,19 @@ collectors:
     ],
     "summary": {
       "total_domains": 2,
+      "with_mx_count": 1,
       "with_mx_pct": 50,
+      "with_spf_count": 2,
       "with_spf_pct": 100,
+      "with_dmarc_count": 2,
       "with_dmarc_pct": 100,
+      "with_dkim_count": 1,
       "with_dkim_pct": 50,
+      "with_all_three_count": 1,
       "with_all_three_pct": 50,
+      "enforced_count": 2,
       "enforced_pct": 100,
+      "with_reporting_count": 1,
       "with_reporting_pct": 50,
       "all_enforced": true
     }
@@ -151,6 +160,10 @@ Each domain includes an `assessment` object:
 | `enforced_pct` | Percentage with DMARC `p=reject` |
 | `with_reporting_pct` | Percentage with aggregate reporting (`rua`) |
 | `all_enforced` | `true` only if ALL domains have `p=reject` |
+
+Each percentage has a count beside it, such as `with_mx_count`, the number of domains it counts. The percentage is that count over `total_domains`, rounded down.
+
+A value is absent when a lookup it depends on failed, such as a SERVFAIL or a timeout, and the collector result artifact records a gap for it. See [Partial Collection and Exit Codes](configuration.md#partial-collection-and-exit-codes).
 
 ### Pass Criteria
 

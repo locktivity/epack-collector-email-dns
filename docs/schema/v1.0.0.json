@@ -4,18 +4,21 @@
   "title": "Email DNS Posture",
   "description": "Email DNS security posture for a list of domains",
   "type": "object",
-  "required": ["schema_version", "collected_at", "domains", "summary"],
+  "required": ["schema_version", "collected_at", "domains"],
   "properties": {
     "schema_version": {
       "type": "string",
-      "const": "1.0.0"
+      "const": "1.0.0",
+      "description": "Version of this schema"
     },
     "collected_at": {
       "type": "string",
-      "format": "date-time"
+      "format": "date-time",
+      "description": "When the domains were scanned, in RFC 3339 UTC"
     },
     "domains": {
       "type": "array",
+      "description": "One result per configured domain, in the order configured",
       "items": {
         "$ref": "#/$defs/DomainResult"
       }
@@ -24,13 +27,14 @@
       "$ref": "#/$defs/Summary"
     },
     "diagnostics": {
-      "$ref": "#/$defs/Diagnostics"
+      "$ref": "#/$defs/Diagnostics",
+      "description": "Every domain's failed lookups in one list. Absent when no lookup failed."
     }
   },
   "$defs": {
     "DomainResult": {
       "type": "object",
-      "required": ["domain", "mx", "assessment"],
+      "required": ["domain"],
       "properties": {
         "domain": {
           "type": "string",
@@ -40,15 +44,20 @@
           "type": "array",
           "items": {
             "$ref": "#/$defs/MXRecord"
-          }
+          },
+          "description": "Mail exchange records sorted by priority, empty when the domain has none. Absent when the lookup failed."
         },
         "spf": {
+          "description": "The domain's SPF record, null when it publishes none. Absent when the lookup failed.",
+          "x-epack-null": "The domain publishes no SPF record",
           "oneOf": [
             { "$ref": "#/$defs/SPFRecord" },
             { "type": "null" }
           ]
         },
         "dmarc": {
+          "description": "The domain's DMARC record, null when it publishes none. Absent when the lookup failed.",
+          "x-epack-null": "The domain publishes no DMARC record",
           "oneOf": [
             { "$ref": "#/$defs/DMARCRecord" },
             { "type": "null" }
@@ -58,13 +67,15 @@
           "type": "array",
           "items": {
             "$ref": "#/$defs/DKIMRecord"
-          }
+          },
+          "description": "DKIM records found at the common selectors, empty when none has one. When some selectors' lookups failed, it holds the records the others returned, with a partial gap. Absent when every selector's lookup failed."
         },
         "assessment": {
           "$ref": "#/$defs/Assessment"
         },
         "errors": {
           "type": "array",
+          "description": "Lookups that failed for this domain, such as a SERVFAIL, each as a message. The values they leave out have gaps in the collector result.",
           "items": {
             "type": "string"
           }
@@ -89,21 +100,21 @@
     },
     "SPFRecord": {
       "type": "object",
-      "required": ["record", "valid"],
+      "required": ["record"],
       "properties": {
         "record": {
           "type": "string",
           "description": "The SPF TXT record value"
         },
         "valid": {
-          "type": "boolean",
+          "type": ["boolean", "null"],
           "description": "Whether the record is valid"
         }
       }
     },
     "DMARCRecord": {
       "type": "object",
-      "required": ["record", "policy", "subdomain_policy", "pct", "valid"],
+      "required": ["record"],
       "properties": {
         "record": {
           "type": "string",
@@ -120,7 +131,7 @@
           "description": "Subdomain policy (sp= value, defaults to policy)"
         },
         "pct": {
-          "type": "integer",
+          "type": ["integer", "null"],
           "minimum": 0,
           "maximum": 100,
           "description": "Percentage of messages to apply policy"
@@ -134,14 +145,14 @@
           "description": "Forensic report URI"
         },
         "valid": {
-          "type": "boolean",
+          "type": ["boolean", "null"],
           "description": "Whether the record is valid"
         }
       }
     },
     "DKIMRecord": {
       "type": "object",
-      "required": ["selector", "record", "valid"],
+      "required": ["selector", "record"],
       "properties": {
         "selector": {
           "type": "string",
@@ -152,95 +163,144 @@
           "description": "The DKIM TXT record value"
         },
         "valid": {
-          "type": "boolean",
+          "type": ["boolean", "null"],
           "description": "Whether the record is valid"
         }
       }
     },
     "Assessment": {
-      "type": "object",
-      "required": ["enforced", "has_reporting"],
+      "type": ["object", "null"],
+      "description": "Empty when the DMARC lookup failed, which leaves every value undecided.",
       "properties": {
         "enforced": {
-          "type": "boolean",
-          "description": "True if DMARC policy is reject with pct=100"
+          "type": ["boolean", "null"],
+          "description": "True if DMARC policy is reject with pct=100. Absent when the DMARC lookup failed."
         },
         "has_reporting": {
-          "type": "boolean",
-          "description": "True if rua (aggregate reports) is configured"
+          "type": ["boolean", "null"],
+          "description": "True if rua (aggregate reports) is configured. Absent when the DMARC lookup failed."
         },
         "issues": {
           "type": "array",
           "items": {
             "type": "string"
           },
-          "description": "List of problems found"
+          "description": "List of problems found, empty when there are none. Absent when the SPF or DMARC lookup failed, or when a DKIM selector's lookup failed and no valid DKIM record was found."
         }
       }
     },
     "Summary": {
-      "type": "object",
-      "required": [
-        "total_domains",
-        "with_mx_pct",
-        "with_spf_pct",
-        "with_dmarc_pct",
-        "with_dkim_pct",
-        "with_all_three_pct",
-        "enforced_pct",
-        "with_reporting_pct",
-        "all_enforced"
-      ],
+      "type": ["object", "null"],
+      "description": "Each percentage is its count over total_domains, rounded down. A count, a percentage, or all_enforced is absent when a lookup it depends on failed for any domain.",
       "properties": {
         "total_domains": {
-          "type": "integer",
+          "type": ["integer", "null"],
           "minimum": 0,
-          "description": "Total number of domains scanned"
+          "description": "Total number of domains scanned",
+          "x-epack-rollup": {"rows": "/domains", "as": "count"}
+        },
+        "with_mx_count": {
+          "type": ["integer", "null"],
+          "minimum": 0,
+          "description": "Domains with at least one MX record"
         },
         "with_mx_pct": {
-          "type": "integer",
+          "type": ["integer", "null"],
           "minimum": 0,
           "maximum": 100,
-          "description": "Percentage of domains with MX records"
+          "description": "Percentage of domains with MX records",
+          "x-epack-denominator": "total_domains",
+          "x-epack-numerator": "with_mx_count",
+          "x-epack-rounding": "floor"
+        },
+        "with_spf_count": {
+          "type": ["integer", "null"],
+          "minimum": 0,
+          "description": "Domains that publish an SPF record, valid or not"
         },
         "with_spf_pct": {
-          "type": "integer",
+          "type": ["integer", "null"],
           "minimum": 0,
           "maximum": 100,
-          "description": "Percentage of domains with SPF records"
+          "description": "Percentage of domains with SPF records",
+          "x-epack-denominator": "total_domains",
+          "x-epack-numerator": "with_spf_count",
+          "x-epack-rounding": "floor"
+        },
+        "with_dmarc_count": {
+          "type": ["integer", "null"],
+          "minimum": 0,
+          "description": "Domains that publish a DMARC record, valid or not"
         },
         "with_dmarc_pct": {
-          "type": "integer",
+          "type": ["integer", "null"],
           "minimum": 0,
           "maximum": 100,
-          "description": "Percentage of domains with DMARC records"
+          "description": "Percentage of domains with DMARC records",
+          "x-epack-denominator": "total_domains",
+          "x-epack-numerator": "with_dmarc_count",
+          "x-epack-rounding": "floor"
+        },
+        "with_dkim_count": {
+          "type": ["integer", "null"],
+          "minimum": 0,
+          "description": "Domains with a DKIM record at one of the common selectors"
         },
         "with_dkim_pct": {
-          "type": "integer",
+          "type": ["integer", "null"],
           "minimum": 0,
           "maximum": 100,
-          "description": "Percentage of domains with DKIM records"
+          "description": "Percentage of domains with DKIM records",
+          "x-epack-denominator": "total_domains",
+          "x-epack-numerator": "with_dkim_count",
+          "x-epack-rounding": "floor"
+        },
+        "with_all_three_count": {
+          "type": ["integer", "null"],
+          "minimum": 0,
+          "description": "Domains with MX, SPF, and DMARC records"
         },
         "with_all_three_pct": {
-          "type": "integer",
+          "type": ["integer", "null"],
           "minimum": 0,
           "maximum": 100,
-          "description": "Percentage of domains with MX, SPF, and DMARC"
+          "description": "Percentage of domains with MX, SPF, and DMARC",
+          "x-epack-denominator": "total_domains",
+          "x-epack-numerator": "with_all_three_count",
+          "x-epack-rounding": "floor"
+        },
+        "enforced_count": {
+          "type": ["integer", "null"],
+          "minimum": 0,
+          "description": "Domains whose DMARC policy is p=reject applied to all mail (pct=100)"
         },
         "enforced_pct": {
-          "type": "integer",
+          "type": ["integer", "null"],
           "minimum": 0,
           "maximum": 100,
-          "description": "Percentage of domains with DMARC p=reject"
+          "description": "Percentage of domains with DMARC p=reject",
+          "x-epack-denominator": "total_domains",
+          "x-epack-numerator": "enforced_count",
+          "x-epack-rounding": "floor",
+          "x-epack-rollup": {"rows": "/domains", "where": "/assessment/enforced", "as": "pct"}
+        },
+        "with_reporting_count": {
+          "type": ["integer", "null"],
+          "minimum": 0,
+          "description": "Domains whose valid DMARC record names an aggregate report address (rua)"
         },
         "with_reporting_pct": {
-          "type": "integer",
+          "type": ["integer", "null"],
           "minimum": 0,
           "maximum": 100,
-          "description": "Percentage of domains with rua configured"
+          "description": "Percentage of domains with rua configured",
+          "x-epack-denominator": "total_domains",
+          "x-epack-numerator": "with_reporting_count",
+          "x-epack-rounding": "floor",
+          "x-epack-rollup": {"rows": "/domains", "where": "/assessment/has_reporting", "as": "pct"}
         },
         "all_enforced": {
-          "type": "boolean",
+          "type": ["boolean", "null"],
           "description": "True if all domains have p=reject"
         }
       }

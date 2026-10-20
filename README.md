@@ -93,6 +93,10 @@ The collector outputs to `artifacts/email-dns.json`. See [docs/schema/v1.0.0.jso
 | `assessment.has_reporting` | `true` if `rua` (aggregate reports) is configured |
 | `summary.all_enforced` | `true` only if ALL domains have `p=reject` |
 
+### Partial Collection
+
+The run fails only when the configuration is invalid (exit 2). A lookup that fails with SERVFAIL, a refused query, or a timeout leaves the values that depend on it out of the artifact rather than reading as a missing record, and `artifacts/email-dns.collector-result.json` records a gap for each. See [Partial Collection and Exit Codes](docs/configuration.md#partial-collection-and-exit-codes).
+
 ### Pass Criteria
 
 For full compliance per the email authentication requirements:

@@ -39,6 +39,8 @@ All metrics include enforcement status (whether DMARC is set to `p=reject`) and 
 5. Summary statistics are aggregated
 6. Output is wrapped in the epack collector protocol envelope
 
+A name or record that does not exist is an answer, not a failure. A lookup that fails with SERVFAIL, a refused query, or a timeout leaves the values that depend on it out of the output, and the collector result artifact, `artifacts/email-dns.collector-result.json`, records a gap for each. See [Partial Collection and Exit Codes](configuration.md#partial-collection-and-exit-codes).
+
 ## Authentication
 
 This collector does not require authentication - it only queries public DNS records.

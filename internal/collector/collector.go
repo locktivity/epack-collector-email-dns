@@ -1,103 +1,165 @@
 package collector
 
 import (
+	"cmp"
 	"context"
+	"errors"
+	"fmt"
 	"net"
 	"sort"
 	"strconv"
 	"strings"
-	"time"
+
+	"github.com/locktivity/epack/componentsdk"
 )
 
 // Common DKIM selectors to check
 var commonDKIMSelectors = []string{
 	"default",
 	"selector1", "selector2", // Microsoft 365
-	"google",                 // Google Workspace
-	"k1",                     // Mailchimp
-	"s1", "s2",               // Generic
+	"google",   // Google Workspace
+	"k1",       // Mailchimp
+	"s1", "s2", // Generic
 	"mail",
 	"dkim",
 }
 
-// Collect gathers email DNS posture for all configured domains.
-func Collect(ctx context.Context, cfg Config) (*EmailDNSPosture, error) {
+// Lookup operations, as the collector result counts them.
+const (
+	opMX    = "dns.mx.lookup"
+	opSPF   = "dns.spf.lookup"
+	opDMARC = "dns.dmarc.lookup"
+	opDKIM  = "dns.dkim.lookup"
+)
+
+// Steps of a run, in order. Each looks up one kind of record for every
+// domain.
+const (
+	stepMX    = "mail_servers"
+	stepSPF   = "spf"
+	stepDMARC = "dmarc"
+	stepDKIM  = "dkim"
+)
+
+// Collect gathers email DNS posture for all configured domains. A name or
+// record that does not exist is an answer. Any other lookup failure, such as
+// SERVFAIL or a timeout, leaves the values that depend on it out of the
+// posture, with a gap for each in cfg.Recorder.
+func Collect(ctx context.Context, cfg Config) *EmailDNSPosture {
+	s := scanner{resolver: cfg.Resolver, rec: cfg.Recorder, progress: cfg.OnProgress}
+	scans := make([]domainScan, len(cfg.Domains))
+	for i, domain := range cfg.Domains {
+		scans[i].result = DomainResult{Domain: domain, Errors: []string{}}
+	}
+
+	s.step(ctx, stepMX, "Mail servers", scans, func(ctx context.Context, d *domainScan) {
+		d.mx = s.collectMX(ctx, d.result.Domain, &d.result)
+	})
+	s.step(ctx, stepSPF, "SPF records", scans, func(ctx context.Context, d *domainScan) {
+		d.spf = s.collectSPF(ctx, d.result.Domain, &d.result)
+	})
+	s.step(ctx, stepDMARC, "DMARC policies", scans, func(ctx context.Context, d *domainScan) {
+		d.dmarc = s.collectDMARC(ctx, d.result.Domain, &d.result)
+	})
+	s.step(ctx, stepDKIM, "DKIM keys at common selectors", scans, func(ctx context.Context, d *domainScan) {
+		d.dkimUnread, d.dkim = s.collectDKIM(ctx, d.result.Domain, &d.result)
+	})
+
 	posture := &EmailDNSPosture{
 		SchemaVersion: "1.0.0",
-		CollectedAt:   time.Now().UTC(),
-		Domains:       make([]DomainResult, 0, len(cfg.Domains)),
+		CollectedAt:   cfg.Now().UTC(),
+		Domains:       make([]DomainResult, 0, len(scans)),
 	}
-
-	total := len(cfg.Domains)
-	for i, domain := range cfg.Domains {
-		select {
-		case <-ctx.Done():
-			return nil, ctx.Err()
-		default:
-		}
-
-		if cfg.OnStatus != nil {
-			cfg.OnStatus("Scanning " + domain)
-		}
-		if cfg.OnProgress != nil {
-			cfg.OnProgress(int64(i), int64(total), "Scanning "+domain)
-		}
-
-		result := collectDomain(ctx, domain)
-		posture.Domains = append(posture.Domains, result)
-
-		// Check if context was cancelled during collection
-		select {
-		case <-ctx.Done():
-			return nil, ctx.Err()
-		default:
-		}
+	for i := range scans {
+		s.assess(i, &scans[i])
+		posture.Domains = append(posture.Domains, scans[i].result)
 	}
-
 	if cfg.OnProgress != nil {
-		cfg.OnProgress(int64(total), int64(total), "Collection complete")
+		cfg.OnProgress(int64(len(scans)), int64(len(scans)), "Collection complete")
 	}
 
-	posture.Summary = computeSummary(posture.Domains)
+	posture.Summary = s.summarize(scans)
 	posture.Diagnostics = computeDiagnostics(posture.Domains)
-	return posture, nil
+	return posture
 }
 
-func collectDomain(ctx context.Context, domain string) DomainResult {
-	result := DomainResult{
-		Domain: domain,
-		MX:     []MXRecord{},
-		Errors: []string{},
-	}
-
-	// Collect MX records
-	collectMX(ctx, domain, &result)
-
-	// Collect SPF record
-	collectSPF(ctx, domain, &result)
-
-	// Collect DMARC record
-	collectDMARC(ctx, domain, &result)
-
-	// Collect DKIM records for common selectors
-	collectDKIM(ctx, domain, &result)
-
-	// Compute assessment
-	result.Assessment = computeAssessment(&result)
-
-	return result
+// scanner looks up each domain's records and records a gap for each value a
+// failed lookup leaves out.
+type scanner struct {
+	resolver Resolver
+	rec      *componentsdk.Recorder
+	progress func(current, total int64, message string)
 }
 
-func collectMX(ctx context.Context, domain string, result *DomainResult) {
-	resolver := net.Resolver{}
-	mxRecords, err := resolver.LookupMX(ctx, domain)
-	if err != nil {
-		if !isNotFound(err) {
-			result.Errors = append(result.Errors, "MX lookup failed: "+err.Error())
+// step runs lookup for every domain as the run's step named name.
+func (s *scanner) step(ctx context.Context, name, title string, scans []domainScan, lookup func(context.Context, *domainScan)) {
+	ctx, step := componentsdk.StartStep(ctx, name, title)
+	defer step.End()
+	for i := range scans {
+		if s.progress != nil {
+			s.progress(int64(i), int64(len(scans)), title+": "+scans[i].result.Domain)
 		}
-		return
+		lookup(ctx, &scans[i])
+	}
+}
+
+// domainScan is one domain's result with the error of each lookup that
+// failed, so the summary can tell a domain without a record from one whose
+// record could not be read.
+type domainScan struct {
+	result               DomainResult
+	mx, spf, dmarc, dkim error
+	dkimUnread           int
+}
+
+// assess evaluates the domain at index from its lookups and records a gap for
+// each value a failed lookup left out.
+func (s *scanner) assess(index int, d *domainScan) {
+	r := &d.result
+	r.Assessment = computeAssessment(r, d.dkim == nil)
+
+	if d.mx != nil {
+		s.rec.NotCollected(domainAt(index, "mx"), d.mx)
+	}
+	if d.spf != nil {
+		s.rec.NotCollected(domainAt(index, "spf"), d.spf)
+	}
+	if d.dmarc != nil {
+		s.rec.NotCollected(domainAt(index, "dmarc"), d.dmarc)
+		s.rec.NotCollected(domainAt(index, "assessment/enforced"), d.dmarc)
+		s.rec.NotCollected(domainAt(index, "assessment/has_reporting"), d.dmarc)
+	}
+	switch {
+	case d.dkim != nil && r.DKIM != nil:
+		s.rec.Partial(domainAt(index, "dkim"), d.dkimUnread, d.dkim)
+	case d.dkim != nil:
+		s.rec.NotCollected(domainAt(index, "dkim"), d.dkim)
+	}
+	if r.Assessment.Issues == nil {
+		s.rec.NotCollected(domainAt(index, "assessment/issues"), cmp.Or(d.spf, d.dmarc, d.dkim))
+	}
+}
+
+func domainAt(index int, field string) componentsdk.Location {
+	return componentsdk.Location{Path: ArtifactPath, Pointer: fmt.Sprintf("/domains/%d/%s", index, field)}
+}
+
+func summaryAt(field string) componentsdk.Location {
+	return componentsdk.Location{Path: ArtifactPath, Pointer: "/summary/" + field}
+}
+
+func named(ctx context.Context, op string) context.Context {
+	return componentsdk.WithOperation(ctx, componentsdk.Operation{Name: op})
+}
+
+func (s *scanner) collectMX(ctx context.Context, domain string, result *DomainResult) error {
+	mxRecords, err := s.resolver.LookupMX(named(ctx, opMX), domain)
+	if err != nil && !isNotFound(err) {
+		result.Errors = append(result.Errors, "MX lookup failed: "+err.Error())
+		return err
 	}
 
+	result.MX = make([]MXRecord, 0, len(mxRecords))
 	for _, mx := range mxRecords {
 		result.MX = append(result.MX, MXRecord{
 			Host:     strings.TrimSuffix(mx.Host, "."),
@@ -109,17 +171,16 @@ func collectMX(ctx context.Context, domain string, result *DomainResult) {
 	sort.Slice(result.MX, func(i, j int) bool {
 		return result.MX[i].Priority < result.MX[j].Priority
 	})
+	return nil
 }
 
-func collectSPF(ctx context.Context, domain string, result *DomainResult) {
-	resolver := net.Resolver{}
-	txtRecords, err := resolver.LookupTXT(ctx, domain)
-	if err != nil {
-		if !isNotFound(err) {
-			result.Errors = append(result.Errors, "SPF lookup failed: "+err.Error())
-		}
-		return
+func (s *scanner) collectSPF(ctx context.Context, domain string, result *DomainResult) error {
+	txtRecords, err := s.resolver.LookupTXT(named(ctx, opSPF), domain)
+	if err != nil && !isNotFound(err) {
+		result.Errors = append(result.Errors, "SPF lookup failed: "+err.Error())
+		return err
 	}
+	result.SPF.Read = true
 
 	var spfRecords []string
 	for _, txt := range txtRecords {
@@ -129,35 +190,34 @@ func collectSPF(ctx context.Context, domain string, result *DomainResult) {
 	}
 
 	if len(spfRecords) == 0 {
-		return
+		return nil
 	}
 
 	// Multiple SPF records is an invalid configuration per RFC 7208
 	if len(spfRecords) > 1 {
-		result.SPF = &SPFRecord{
+		result.SPF.Record = &SPFRecord{
 			Record: spfRecords[0],
 			Valid:  false,
 		}
 		result.Errors = append(result.Errors, "Multiple SPF records found (invalid per RFC 7208)")
-		return
+		return nil
 	}
 
-	result.SPF = &SPFRecord{
+	result.SPF.Record = &SPFRecord{
 		Record: spfRecords[0],
 		Valid:  validateSPF(spfRecords[0]),
 	}
+	return nil
 }
 
-func collectDMARC(ctx context.Context, domain string, result *DomainResult) {
-	resolver := net.Resolver{}
+func (s *scanner) collectDMARC(ctx context.Context, domain string, result *DomainResult) error {
 	dmarcDomain := "_dmarc." + domain
-	txtRecords, err := resolver.LookupTXT(ctx, dmarcDomain)
-	if err != nil {
-		if !isNotFound(err) {
-			result.Errors = append(result.Errors, "DMARC lookup failed: "+err.Error())
-		}
-		return
+	txtRecords, err := s.resolver.LookupTXT(named(ctx, opDMARC), dmarcDomain)
+	if err != nil && !isNotFound(err) {
+		result.Errors = append(result.Errors, "DMARC lookup failed: "+err.Error())
+		return err
 	}
+	result.DMARC.Read = true
 
 	var dmarcRecords []string
 	for _, txt := range txtRecords {
@@ -167,19 +227,20 @@ func collectDMARC(ctx context.Context, domain string, result *DomainResult) {
 	}
 
 	if len(dmarcRecords) == 0 {
-		return
+		return nil
 	}
 
 	// Multiple DMARC records is an invalid configuration per RFC 7489
 	if len(dmarcRecords) > 1 {
 		dmarc := parseDMARC(dmarcRecords[0])
 		dmarc.Valid = false
-		result.DMARC = dmarc
+		result.DMARC.Record = dmarc
 		result.Errors = append(result.Errors, "Multiple DMARC records found (invalid per RFC 7489)")
-		return
+		return nil
 	}
 
-	result.DMARC = parseDMARC(dmarcRecords[0])
+	result.DMARC.Record = parseDMARC(dmarcRecords[0])
+	return nil
 }
 
 func parseDMARC(record string) *DMARCRecord {
@@ -230,19 +291,17 @@ func parseDMARC(record string) *DMARCRecord {
 	return dmarc
 }
 
-func collectDKIM(ctx context.Context, domain string, result *DomainResult) {
-	resolver := net.Resolver{}
+// collectDKIM looks up the common selectors and returns how many lookups
+// failed, with the first failure. It keeps the records the selectors that
+// answered returned, and leaves the list out only when every lookup failed.
+func (s *scanner) collectDKIM(ctx context.Context, domain string, result *DomainResult) (int, error) {
+	records := []DKIMRecord{}
+	failed := 0
+	var firstErr error
 
 	for _, selector := range commonDKIMSelectors {
-		select {
-		case <-ctx.Done():
-			result.Errors = append(result.Errors, "DKIM lookup interrupted: "+ctx.Err().Error())
-			return
-		default:
-		}
-
 		dkimDomain := selector + "._domainkey." + domain
-		txtRecords, err := resolver.LookupTXT(ctx, dkimDomain)
+		txtRecords, err := s.resolver.LookupTXT(named(ctx, opDKIM), dkimDomain)
 		if err != nil {
 			// NXDOMAIN is expected for selectors that don't exist
 			if isNotFound(err) {
@@ -250,12 +309,14 @@ func collectDKIM(ctx context.Context, domain string, result *DomainResult) {
 			}
 			// Report real errors (SERVFAIL, timeout, etc.)
 			result.Errors = append(result.Errors, "DKIM lookup failed for selector "+selector+": "+err.Error())
+			failed++
+			firstErr = cmp.Or(firstErr, err)
 			continue
 		}
 
 		for _, txt := range txtRecords {
 			if isDKIMRecord(txt) {
-				result.DKIM = append(result.DKIM, DKIMRecord{
+				records = append(records, DKIMRecord{
 					Selector: selector,
 					Record:   txt,
 					Valid:    validateDKIM(txt),
@@ -264,6 +325,11 @@ func collectDKIM(ctx context.Context, domain string, result *DomainResult) {
 			}
 		}
 	}
+
+	if failed < len(commonDKIMSelectors) {
+		result.DKIM = records
+	}
+	return failed, firstErr
 }
 
 func validateSPF(record string) bool {
@@ -405,54 +471,58 @@ func validateDKIM(record string) bool {
 	return false
 }
 
-func computeAssessment(result *DomainResult) Assessment {
-	assessment := Assessment{}
-	var issues []string
+// computeAssessment evaluates the records it was given and leaves out what a
+// failed lookup leaves undecided. dkimComplete says whether every DKIM
+// selector's lookup answered.
+func computeAssessment(result *DomainResult, dkimComplete bool) Assessment {
+	spf, dmarc := result.SPF.Record, result.DMARC.Record
+	enforced, hasReporting := false, false
+	issues := []string{}
 
 	// Check SPF
-	if result.SPF == nil {
+	if spf == nil {
 		issues = append(issues, "No SPF record")
-	} else if !result.SPF.Valid {
+	} else if !spf.Valid {
 		issues = append(issues, "Invalid SPF record")
 	}
 
 	// Check DMARC
-	if result.DMARC == nil {
+	if dmarc == nil {
 		issues = append(issues, "No DMARC record")
-	} else if !result.DMARC.Valid {
+	} else if !dmarc.Valid {
 		issues = append(issues, "Invalid DMARC record")
 	} else {
-		if result.DMARC.Policy == "reject" && result.DMARC.Pct == 100 {
-			assessment.Enforced = true
-		} else if result.DMARC.Policy == "none" {
+		if dmarc.Policy == "reject" && dmarc.Pct == 100 {
+			enforced = true
+		} else if dmarc.Policy == "none" {
 			issues = append(issues, "DMARC policy is 'none' (monitoring only)")
-		} else if result.DMARC.Policy == "quarantine" {
+		} else if dmarc.Policy == "quarantine" {
 			issues = append(issues, "DMARC policy is 'quarantine' (not reject)")
-		} else if result.DMARC.Pct < 100 {
+		} else if dmarc.Pct < 100 {
 			issues = append(issues, "DMARC pct is less than 100%")
 		}
 
-		if result.DMARC.RUA != "" {
-			assessment.HasReporting = true
+		if dmarc.RUA != "" {
+			hasReporting = true
 		} else {
 			issues = append(issues, "No DMARC aggregate reporting (rua) configured")
 		}
 
-		if result.DMARC.SubdomainPolicy != "reject" {
+		if dmarc.SubdomainPolicy != "reject" {
 			issues = append(issues, "Subdomain policy is not 'reject'")
 		}
 
 		// Check for invalid sp= value (record is still valid, but sp= is malformed)
-		if hasInvalidSP(result.DMARC.Record) {
+		if hasInvalidSP(dmarc.Record) {
 			issues = append(issues, "DMARC sp= tag has invalid value (ignored, using p= for subdomains)")
 		}
 	}
 
 	// Check DKIM (note: only common selectors are checked, custom selectors may exist)
+	hasValidDKIM := false
 	if len(result.DKIM) == 0 {
 		issues = append(issues, "No DKIM records found for common selectors (custom selectors not checked)")
 	} else {
-		hasValidDKIM := false
 		for _, dkim := range result.DKIM {
 			if dkim.Valid {
 				hasValidDKIM = true
@@ -464,12 +534,42 @@ func computeAssessment(result *DomainResult) Assessment {
 		}
 	}
 
-	assessment.Issues = issues
+	var assessment Assessment
+	if result.DMARC.Read {
+		assessment.Enforced, assessment.HasReporting = new(enforced), new(hasReporting)
+	}
+	// A selector whose lookup failed could only add keys, so a valid key
+	// already read settles the DKIM check.
+	if result.SPF.Read && result.DMARC.Read && (dkimComplete || hasValidDKIM) {
+		assessment.Issues = issues
+	}
 	return assessment
 }
 
-func computeSummary(domains []DomainResult) Summary {
-	total := len(domains)
+// tally counts the domains a summary value covers: those it holds for, and
+// those whose lookups failed, with the first failure.
+type tally struct {
+	holds, unread int
+	err           error
+}
+
+// add counts one domain. A domain the value holds for counts even when one of
+// its lookups failed, as when one DKIM selector failed and another returned a
+// record.
+func (t *tally) add(holds bool, err error) {
+	switch {
+	case holds:
+		t.holds++
+	case err != nil:
+		t.unread++
+		t.err = cmp.Or(t.err, err)
+	}
+}
+
+// summarize rolls the domains up. A value is left out, with a partial gap,
+// when a lookup it depends on failed for any domain.
+func (s *scanner) summarize(scans []domainScan) Summary {
+	total := len(scans)
 	summary := Summary{
 		TotalDomains: total,
 	}
@@ -478,43 +578,46 @@ func computeSummary(domains []DomainResult) Summary {
 		return summary
 	}
 
-	var withMX, withSPF, withDMARC, withDKIM, withAllThree, enforced, withReporting int
-
-	for _, d := range domains {
-		if len(d.MX) > 0 {
-			withMX++
-		}
-		if d.SPF != nil {
-			withSPF++
-		}
-		if d.DMARC != nil {
-			withDMARC++
-		}
-		if len(d.DKIM) > 0 {
-			withDKIM++
-		}
-		if len(d.MX) > 0 && d.SPF != nil && d.DMARC != nil {
-			withAllThree++
-		}
-		if d.Assessment.Enforced {
-			enforced++
-		}
-		if d.Assessment.HasReporting {
-			withReporting++
-		}
+	var withMX, withSPF, withDMARC, withDKIM, withAllThree, enforced, withReporting tally
+	for _, d := range scans {
+		r := d.result
+		hasMX, hasSPF, hasDMARC := len(r.MX) > 0, r.SPF.Record != nil, r.DMARC.Record != nil
+		withMX.add(hasMX, d.mx)
+		withSPF.add(hasSPF, d.spf)
+		withDMARC.add(hasDMARC, d.dmarc)
+		withDKIM.add(len(r.DKIM) > 0, d.dkim)
+		withAllThree.add(hasMX && hasSPF && hasDMARC, cmp.Or(d.mx, d.spf, d.dmarc))
+		enforced.add(r.Assessment.Enforced != nil && *r.Assessment.Enforced, d.dmarc)
+		withReporting.add(r.Assessment.HasReporting != nil && *r.Assessment.HasReporting, d.dmarc)
 	}
 
-	// Compute percentages
-	summary.WithMxPct = (withMX * 100) / total
-	summary.WithSpfPct = (withSPF * 100) / total
-	summary.WithDmarcPct = (withDMARC * 100) / total
-	summary.WithDkimPct = (withDKIM * 100) / total
-	summary.WithAllThreePct = (withAllThree * 100) / total
-	summary.EnforcedPct = (enforced * 100) / total
-	summary.WithReportingPct = (withReporting * 100) / total
-	summary.AllEnforced = enforced == total
+	summary.WithMxCount, summary.WithMxPct = s.share("with_mx", withMX, total)
+	summary.WithSpfCount, summary.WithSpfPct = s.share("with_spf", withSPF, total)
+	summary.WithDmarcCount, summary.WithDmarcPct = s.share("with_dmarc", withDMARC, total)
+	summary.WithDkimCount, summary.WithDkimPct = s.share("with_dkim", withDKIM, total)
+	summary.WithAllThreeCount, summary.WithAllThreePct = s.share("with_all_three", withAllThree, total)
+	summary.EnforcedCount, summary.EnforcedPct = s.share("enforced", enforced, total)
+	summary.WithReportingCount, summary.WithReportingPct = s.share("with_reporting", withReporting, total)
+	if enforced.unread > 0 {
+		s.rec.Partial(summaryAt("all_enforced"), enforced.unread, enforced.err)
+	} else {
+		summary.AllEnforced = new(enforced.holds == total)
+	}
 
 	return summary
+}
+
+// share returns how many domains t holds for and that count's percentage of
+// all domains, rounded down. Both are nil, each with a partial gap at the
+// summary's name_count and name_pct, when some domains could not be read.
+func (s *scanner) share(name string, t tally, total int) (count, pct *int) {
+	s.rec.Helper()
+	if t.unread > 0 {
+		s.rec.Partial(summaryAt(name+"_count"), t.unread, t.err)
+		s.rec.Partial(summaryAt(name+"_pct"), t.unread, t.err)
+		return nil, nil
+	}
+	return new(t.holds), new(t.holds * 100 / total)
 }
 
 func computeDiagnostics(domains []DomainResult) *Diagnostics {
@@ -536,10 +639,8 @@ func computeDiagnostics(domains []DomainResult) *Diagnostics {
 }
 
 func isNotFound(err error) bool {
-	if dnsErr, ok := err.(*net.DNSError); ok {
-		return dnsErr.IsNotFound
-	}
-	return false
+	var dnsErr *net.DNSError
+	return errors.As(err, &dnsErr) && dnsErr.IsNotFound
 }
 
 // isSPFRecord checks if a TXT record is a valid SPF record (exact v=spf1 version).

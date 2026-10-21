@@ -1,0 +1,271 @@
+{
+  "name": "email-dns",
+  "recorded_at": "2026-10-21T15:47:13Z",
+  "collector": "email-dns",
+  "collector_version": "record",
+  "config": {
+    "domains": [
+      "enforced.email.example.com",
+      "monitor.email.example.com",
+      "malformed.email.example.com",
+      "bare.email.example.com"
+    ],
+    "level": "audit"
+  },
+  "dns": [
+    {
+      "name": "enforced.email.example.com",
+      "type": "MX",
+      "rcode": "NXDOMAIN"
+    },
+    {
+      "name": "monitor.email.example.com",
+      "type": "MX",
+      "rcode": "NXDOMAIN"
+    },
+    {
+      "name": "malformed.email.example.com",
+      "type": "MX",
+      "rcode": "NXDOMAIN"
+    },
+    {
+      "name": "bare.email.example.com",
+      "type": "MX",
+      "rcode": "NXDOMAIN"
+    },
+    {
+      "name": "enforced.email.example.com",
+      "type": "TXT",
+      "values": [
+        "v=spf1 -all"
+      ]
+    },
+    {
+      "name": "monitor.email.example.com",
+      "type": "TXT",
+      "values": [
+        "v=spf1 ~all"
+      ]
+    },
+    {
+      "name": "malformed.email.example.com",
+      "type": "TXT",
+      "values": [
+        "v=spf1 ipv4:192.0.2.10 -all"
+      ]
+    },
+    {
+      "name": "bare.email.example.com",
+      "type": "TXT",
+      "rcode": "NXDOMAIN"
+    },
+    {
+      "name": "_dmarc.enforced.email.example.com",
+      "type": "TXT",
+      "values": [
+        "v=DMARC1; p=reject; rua=mailto:user1@example.com"
+      ]
+    },
+    {
+      "name": "_dmarc.monitor.email.example.com",
+      "type": "TXT",
+      "values": [
+        "v=DMARC1; p=none"
+      ]
+    },
+    {
+      "name": "_dmarc.malformed.email.example.com",
+      "type": "TXT",
+      "values": [
+        "v=DMARC1; p=quarentine"
+      ]
+    },
+    {
+      "name": "_dmarc.bare.email.example.com",
+      "type": "TXT",
+      "rcode": "NXDOMAIN"
+    },
+    {
+      "name": "default._domainkey.enforced.email.example.com",
+      "type": "TXT",
+      "rcode": "NXDOMAIN"
+    },
+    {
+      "name": "selector1._domainkey.enforced.email.example.com",
+      "type": "TXT",
+      "rcode": "NXDOMAIN"
+    },
+    {
+      "name": "selector2._domainkey.enforced.email.example.com",
+      "type": "TXT",
+      "rcode": "NXDOMAIN"
+    },
+    {
+      "name": "google._domainkey.enforced.email.example.com",
+      "type": "TXT",
+      "rcode": "NXDOMAIN"
+    },
+    {
+      "name": "k1._domainkey.enforced.email.example.com",
+      "type": "TXT",
+      "rcode": "NXDOMAIN"
+    },
+    {
+      "name": "s1._domainkey.enforced.email.example.com",
+      "type": "TXT",
+      "values": [
+        "v=DKIM1; k=rsa; p=scrubbed-token-1"
+      ]
+    },
+    {
+      "name": "s2._domainkey.enforced.email.example.com",
+      "type": "TXT",
+      "rcode": "NXDOMAIN"
+    },
+    {
+      "name": "mail._domainkey.enforced.email.example.com",
+      "type": "TXT",
+      "rcode": "NXDOMAIN"
+    },
+    {
+      "name": "dkim._domainkey.enforced.email.example.com",
+      "type": "TXT",
+      "rcode": "NXDOMAIN"
+    },
+    {
+      "name": "default._domainkey.monitor.email.example.com",
+      "type": "TXT",
+      "rcode": "NXDOMAIN"
+    },
+    {
+      "name": "selector1._domainkey.monitor.email.example.com",
+      "type": "TXT",
+      "rcode": "NXDOMAIN"
+    },
+    {
+      "name": "selector2._domainkey.monitor.email.example.com",
+      "type": "TXT",
+      "rcode": "NXDOMAIN"
+    },
+    {
+      "name": "google._domainkey.monitor.email.example.com",
+      "type": "TXT",
+      "rcode": "NXDOMAIN"
+    },
+    {
+      "name": "k1._domainkey.monitor.email.example.com",
+      "type": "TXT",
+      "rcode": "NXDOMAIN"
+    },
+    {
+      "name": "s1._domainkey.monitor.email.example.com",
+      "type": "TXT",
+      "rcode": "NXDOMAIN"
+    },
+    {
+      "name": "s2._domainkey.monitor.email.example.com",
+      "type": "TXT",
+      "rcode": "NXDOMAIN"
+    },
+    {
+      "name": "mail._domainkey.monitor.email.example.com",
+      "type": "TXT",
+      "rcode": "NXDOMAIN"
+    },
+    {
+      "name": "dkim._domainkey.monitor.email.example.com",
+      "type": "TXT",
+      "rcode": "NXDOMAIN"
+    },
+    {
+      "name": "default._domainkey.malformed.email.example.com",
+      "type": "TXT",
+      "rcode": "NXDOMAIN"
+    },
+    {
+      "name": "selector1._domainkey.malformed.email.example.com",
+      "type": "TXT",
+      "rcode": "NXDOMAIN"
+    },
+    {
+      "name": "selector2._domainkey.malformed.email.example.com",
+      "type": "TXT",
+      "rcode": "NXDOMAIN"
+    },
+    {
+      "name": "google._domainkey.malformed.email.example.com",
+      "type": "TXT",
+      "rcode": "NXDOMAIN"
+    },
+    {
+      "name": "k1._domainkey.malformed.email.example.com",
+      "type": "TXT",
+      "rcode": "NXDOMAIN"
+    },
+    {
+      "name": "s1._domainkey.malformed.email.example.com",
+      "type": "TXT",
+      "rcode": "NXDOMAIN"
+    },
+    {
+      "name": "s2._domainkey.malformed.email.example.com",
+      "type": "TXT",
+      "rcode": "NXDOMAIN"
+    },
+    {
+      "name": "mail._domainkey.malformed.email.example.com",
+      "type": "TXT",
+      "rcode": "NXDOMAIN"
+    },
+    {
+      "name": "dkim._domainkey.malformed.email.example.com",
+      "type": "TXT",
+      "rcode": "NXDOMAIN"
+    },
+    {
+      "name": "default._domainkey.bare.email.example.com",
+      "type": "TXT",
+      "rcode": "NXDOMAIN"
+    },
+    {
+      "name": "selector1._domainkey.bare.email.example.com",
+      "type": "TXT",
+      "rcode": "NXDOMAIN"
+    },
+    {
+      "name": "selector2._domainkey.bare.email.example.com",
+      "type": "TXT",
+      "rcode": "NXDOMAIN"
+    },
+    {
+      "name": "google._domainkey.bare.email.example.com",
+      "type": "TXT",
+      "rcode": "NXDOMAIN"
+    },
+    {
+      "name": "k1._domainkey.bare.email.example.com",
+      "type": "TXT",
+      "rcode": "NXDOMAIN"
+    },
+    {
+      "name": "s1._domainkey.bare.email.example.com",
+      "type": "TXT",
+      "rcode": "NXDOMAIN"
+    },
+    {
+      "name": "s2._domainkey.bare.email.example.com",
+      "type": "TXT",
+      "rcode": "NXDOMAIN"
+    },
+    {
+      "name": "mail._domainkey.bare.email.example.com",
+      "type": "TXT",
+      "rcode": "NXDOMAIN"
+    },
+    {
+      "name": "dkim._domainkey.bare.email.example.com",
+      "type": "TXT",
+      "rcode": "NXDOMAIN"
+    }
+  ]
+}

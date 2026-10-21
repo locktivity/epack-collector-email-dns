@@ -4,7 +4,7 @@ go 1.26.0
 
 toolchain go1.26.9
 
-require github.com/locktivity/epack v0.9.1
+require github.com/locktivity/epack v0.9.3
 
 require (
 	github.com/santhosh-tekuri/jsonschema/v6 v6.0.2 // indirect

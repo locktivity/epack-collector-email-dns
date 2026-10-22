@@ -111,22 +111,27 @@ func kitGapPins(gaps ...map[string]any) map[string]any {
 
 // kitShareGaps are the gaps a SERVFAIL leaves at a summary count and its
 // percentage.
-func kitShareGaps(name string, unmeasured int) []map[string]any {
+func kitShareGaps(name string, unmeasured int, op string, call int) []map[string]any {
 	return []map[string]any{
-		kitGap("/summary/"+name+"_count", "partial", unmeasured),
-		kitGap("/summary/"+name+"_pct", "partial", unmeasured),
+		kitGap("/summary/"+name+"_count", "partial", unmeasured, op, call),
+		kitGap("/summary/"+name+"_pct", "partial", unmeasured, op, call),
 	}
 }
 
-// kitGap is the gap a SERVFAIL leaves at pointer in the posture artifact.
-func kitGap(pointer, status string, unmeasured int) map[string]any {
+// kitGap is the gap a SERVFAIL leaves at pointer in the posture artifact. It
+// names the failed lookup by its operation and call. Calls are numbered in
+// the order a kit run's lookups start: 1 to 4 look up MX, 5 to 8 SPF, 9 to 12
+// DMARC, and from 13 the DKIM selectors, nine per domain.
+func kitGap(pointer, status string, unmeasured int, op string, call int) map[string]any {
 	g := map[string]any{
-		"schema":  "evidencepack/email-dns@v1",
-		"path":    ArtifactPath,
-		"pointer": pointer,
-		"status":  status,
-		"code":    "vendor_error",
-		"owner":   "vendor",
+		"schema":    "evidencepack/email-dns@v1",
+		"path":      ArtifactPath,
+		"pointer":   pointer,
+		"status":    status,
+		"code":      "vendor_error",
+		"owner":     "vendor",
+		"operation": op,
+		"call":      call,
 	}
 	if unmeasured > 0 {
 		g["unmeasured"] = unmeasured

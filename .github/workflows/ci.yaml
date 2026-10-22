@@ -12,7 +12,7 @@ permissions:
 
 jobs:
   collector:
-    uses: locktivity/epack/.github/workflows/collector-ci.yaml@c8cf0c52ec071e051001176eb38aacd4f28c1f92 # v0.9.3
+    uses: locktivity/epack/.github/workflows/collector-ci.yaml@f622b7511bfdececc0b9b5177fc313c6f8c76f51 # v0.9.5
     with:
       name: email-dns
       profile-url: ${{ vars.EVIDENCE_PROFILE_URL }}

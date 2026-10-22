@@ -7,7 +7,7 @@ The Email DNS collector queries public DNS records and does not require authenti
 ```yaml
 collectors:
   email-dns:
-    source: locktivity/epack-collector-email-dns@^0.1
+    source: locktivity/epack-collector-email-dns@^0.2
     config:
       domains:
         - example.com
@@ -54,7 +54,7 @@ A name or record that does not exist (NXDOMAIN, or a name with no record of that
 
 A summary value is left out when a lookup it depends on failed for any domain, so `with_spf_count` and `with_spf_pct` are absent if one domain's SPF lookup failed. A domain with a DKIM record counts toward `with_dkim_pct` even when another selector's lookup failed. A run that reaches its time limit emits what it collected, with the remaining values left out the same way.
 
-The artifact `artifacts/email-dns.collector-result.json` lists a gap for each value left out, with its code: `vendor_error` for SERVFAIL or a refused query, and `timeout` for a timeout. A summary value's gap counts the domains left unmeasured. A `dkim` list that holds the records some selectors returned has a `partial` gap that counts the selectors whose lookups failed. The artifact also counts the lookups by operation (`dns.mx.lookup`, `dns.spf.lookup`, `dns.dmarc.lookup`, and `dns.dkim.lookup`) and response code. The per-domain `errors` and `diagnostics.domain_errors` entries remain.
+The artifact `artifacts/email-dns.collector-result.json` lists a gap for each value left out, with its code: `vendor_error` for SERVFAIL or a refused query, and `timeout` for a timeout. A summary value's gap counts the domains left unmeasured. A `dkim` list that holds the records some selectors returned has a `partial` gap that counts the selectors whose lookups failed. The artifact also counts the lookups by operation (`dns.mx.lookup`, `dns.spf.lookup`, `dns.dmarc.lookup`, and `dns.dkim.lookup`) and response code. Each gap names the `operation` and `call` number of the lookup that failed. The per-domain `errors` and `diagnostics.domain_errors` entries remain.
 
 | Exit | Code | When |
 |------|------|------|

@@ -18,7 +18,7 @@ See [docs/overview.md](docs/overview.md) for detailed documentation.
 # epack.yaml
 collectors:
   email-dns:
-    source: locktivity/epack-collector-email-dns@^0.1
+    source: locktivity/epack-collector-email-dns@^0.2
     config:
       domains:
         - example.com

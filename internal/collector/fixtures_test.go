@@ -120,8 +120,10 @@ func kitShareGaps(name string, unmeasured int, op string, call int) []map[string
 
 // kitGap is the gap a SERVFAIL leaves at pointer in the posture artifact. It
 // names the failed lookup by its operation and call. Calls are numbered in
-// the order a kit run's lookups start: 1 to 4 look up MX, 5 to 8 SPF, 9 to 12
-// DMARC, and from 13 the DKIM selectors, nine per domain.
+// the order a kit run's lookups start: 1 to 4 look up MX, 5 to 8 SPF, 9 to 13
+// DMARC, and from 14 the DKIM selectors, nine per domain. DMARC takes five
+// calls because parked.example has no record, so the DNS tree walk also
+// looks up _dmarc.example.
 func kitGap(pointer, status string, unmeasured int, op string, call int) map[string]any {
 	g := map[string]any{
 		"schema":    "evidencepack/email-dns@v1",

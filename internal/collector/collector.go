@@ -3,14 +3,20 @@ package collector
 import (
 	"cmp"
 	"context"
+	"encoding/base64"
 	"errors"
 	"fmt"
 	"net"
+	"slices"
 	"sort"
 	"strconv"
 	"strings"
+	"unicode/utf8"
 
+	"github.com/locktivity/epack-collector-email-dns/internal/dmarc"
+	"github.com/locktivity/epack-collector-email-dns/internal/spf"
 	"github.com/locktivity/epack/componentsdk"
+	"golang.org/x/net/idna"
 )
 
 // Common DKIM selectors to check
@@ -49,20 +55,27 @@ func Collect(ctx context.Context, cfg Config) *EmailDNSPosture {
 	s := scanner{resolver: cfg.Resolver, rec: cfg.Recorder, progress: cfg.OnProgress}
 	scans := make([]domainScan, len(cfg.Domains))
 	for i, domain := range cfg.Domains {
+		name, err := lookupName(domain)
+		if err != nil {
+			// Run rejects a domain with no A-label form, so only a direct
+			// caller gets here. Its lookups use the domain as written.
+			name = domain
+		}
+		scans[i].name = name
 		scans[i].result = DomainResult{Domain: domain, Errors: []string{}}
 	}
 
 	s.step(ctx, stepMX, "Mail servers", scans, func(ctx context.Context, d *domainScan) {
-		d.mx = s.collectMX(ctx, d.result.Domain, &d.result)
+		d.mx = s.collectMX(ctx, d.name, &d.result)
 	})
 	s.step(ctx, stepSPF, "SPF records", scans, func(ctx context.Context, d *domainScan) {
-		d.spf = s.collectSPF(ctx, d.result.Domain, &d.result)
+		d.spf = s.collectSPF(ctx, d.name, &d.result)
 	})
 	s.step(ctx, stepDMARC, "DMARC policies", scans, func(ctx context.Context, d *domainScan) {
-		d.dmarc = s.collectDMARC(ctx, d.result.Domain, &d.result)
+		d.dmarc = s.collectDMARC(ctx, d.name, &d.result)
 	})
 	s.step(ctx, stepDKIM, "DKIM keys at common selectors", scans, func(ctx context.Context, d *domainScan) {
-		d.dkimUnread, d.dkim = s.collectDKIM(ctx, d.result.Domain, &d.result)
+		d.dkimUnread, d.dkim = s.collectDKIM(ctx, d.name, &d.result)
 	})
 
 	posture := &EmailDNSPosture{
@@ -105,11 +118,25 @@ func (s *scanner) step(ctx context.Context, name, title string, scans []domainSc
 
 // domainScan is one domain's result with the error of each lookup that
 // failed, so the summary can tell a domain without a record from one whose
-// record could not be read.
+// record could not be read. name is the domain as its lookups use it.
 type domainScan struct {
+	name                 string
 	result               DomainResult
 	mx, spf, dmarc, dkim error
 	dkimUnread           int
+}
+
+// lookupName returns the name that domain's lookups use. A domain written
+// with Unicode characters is looked up by its A-label form, as RFC 5891
+// section 5.5 says. lookupName fails for one that has no A-label form. An
+// ASCII domain is looked up as written.
+func lookupName(domain string) (string, error) {
+	for i := 0; i < len(domain); i++ {
+		if domain[i] >= utf8.RuneSelf {
+			return idna.Lookup.ToASCII(domain)
+		}
+	}
+	return domain, nil
 }
 
 // assess evaluates the domain at index from its lookups and records a gap for
@@ -184,7 +211,7 @@ func (s *scanner) collectSPF(ctx context.Context, domain string, result *DomainR
 
 	var spfRecords []string
 	for _, txt := range txtRecords {
-		if isSPFRecord(txt) {
+		if spf.IsRecord(txt) {
 			spfRecords = append(spfRecords, txt)
 		}
 	}
@@ -210,85 +237,85 @@ func (s *scanner) collectSPF(ctx context.Context, domain string, result *DomainR
 	return nil
 }
 
+// collectDMARC finds the DMARC record that applies to the domain, as RFC
+// 9989 section 4.10 defines it. That is the domain's own record, or the one
+// the DNS tree walk finds above it.
 func (s *scanner) collectDMARC(ctx context.Context, domain string, result *DomainResult) error {
-	dmarcDomain := "_dmarc." + domain
-	txtRecords, err := s.resolver.LookupTXT(named(ctx, opDMARC), dmarcDomain)
-	if err != nil && !isNotFound(err) {
+	answers := map[string][]string{}
+	lookup := func(ctx context.Context, name string) ([]string, error) {
+		txts, err := s.resolver.LookupTXT(ctx, name)
+		answers[name] = txts
+		return txts, err
+	}
+	found, ok, err := dmarc.Discover(named(ctx, opDMARC), domain, lookup)
+	if err != nil {
 		result.Errors = append(result.Errors, "DMARC lookup failed: "+err.Error())
 		return err
 	}
 	result.DMARC.Read = true
 
-	var dmarcRecords []string
-	for _, txt := range txtRecords {
-		if isDMARCRecord(txt) {
-			dmarcRecords = append(dmarcRecords, txt)
-		}
+	// Receivers ignore every record at a name that has more than one, and
+	// look further up the tree.
+	own := found.Queried[0]
+	if len(dmarcRecords(answers[own])) > 1 {
+		result.Errors = append(result.Errors, "Multiple DMARC records found (receivers ignore them)")
 	}
-
-	if len(dmarcRecords) == 0 {
+	if !ok {
 		return nil
 	}
-
-	// Multiple DMARC records is an invalid configuration per RFC 7489
-	if len(dmarcRecords) > 1 {
-		dmarc := parseDMARC(dmarcRecords[0])
-		dmarc.Valid = false
-		result.DMARC.Record = dmarc
-		result.Errors = append(result.Errors, "Multiple DMARC records found (invalid per RFC 7489)")
-		return nil
-	}
-
-	result.DMARC.Record = parseDMARC(dmarcRecords[0])
+	at := "_dmarc." + found.At
+	text := dmarcRecords(answers[at])[0]
+	result.DMARC.Record = newDMARCRecord(text, found.Record, at != own)
 	return nil
 }
 
-func parseDMARC(record string) *DMARCRecord {
-	dmarc := &DMARCRecord{
-		Record: record,
-		Pct:    100, // Default per RFC
-		Valid:  validateDMARC(record),
-	}
-
-	parts := strings.Split(record, ";")
-	for _, part := range parts {
-		key, value := parseDMARCTag(part)
-
-		switch key {
-		case "p":
-			policy := strings.ToLower(value)
-			if policy == "none" || policy == "quarantine" || policy == "reject" {
-				dmarc.Policy = policy
-			} else {
-				dmarc.Policy = "unknown"
-			}
-
-		case "sp":
-			sp := strings.ToLower(value)
-			if sp == "none" || sp == "quarantine" || sp == "reject" {
-				dmarc.SubdomainPolicy = sp
-			}
-
-		case "pct":
-			if pct, err := strconv.Atoi(value); err == nil && pct >= 0 && pct <= 100 {
-				dmarc.Pct = pct
-			}
-
-		case "rua":
-			// Value already trimmed by parseDMARCTag, preserves original case
-			dmarc.RUA = value
-
-		case "ruf":
-			dmarc.RUF = value
+// dmarcRecords returns the TXT records that are DMARC records.
+func dmarcRecords(txts []string) []string {
+	var out []string
+	for _, txt := range txts {
+		if _, ok := dmarc.Parse(txt); ok {
+			out = append(out, txt)
 		}
 	}
+	return out
+}
 
-	// If no subdomain policy, it inherits from main policy
-	if dmarc.SubdomainPolicy == "" {
-		dmarc.SubdomainPolicy = dmarc.Policy
+// newDMARCRecord describes the DMARC record r, whose text is text. above is
+// true when the DNS tree walk found the record above the domain.
+func newDMARCRecord(text string, r dmarc.Record, above bool) *DMARCRecord {
+	d := &DMARCRecord{
+		Record:          text,
+		Policy:          "unknown",
+		SubdomainPolicy: "unknown",
+		Pct:             100,
+		RUA:             tagValue(text, "rua"),
+		RUF:             tagValue(text, "ruf"),
+		parsed:          r,
+		above:           above,
 	}
+	if pct, err := strconv.Atoi(r.Legacy["pct"]); err == nil && pct >= 0 && pct <= 100 {
+		d.Pct = pct
+	}
+	// Receivers treat a record with no valid p tag, or an invalid sp or np
+	// tag, as p=none when it lists a valid rua URI. Without one, no DMARC
+	// policy applies, and the record is not valid.
+	if p, ok := r.Requested(false, true); ok {
+		sp, _ := r.Requested(true, true)
+		d.Policy, d.SubdomainPolicy, d.Valid = string(p), string(sp), true
+	}
+	return d
+}
 
-	return dmarc
+// tagValue returns the value of the first tag called name in a DMARC
+// record, as written, or "" when the record has no such tag.
+func tagValue(record, name string) string {
+	for _, part := range strings.Split(record, ";") {
+		key, value, ok := strings.Cut(part, "=")
+		if ok && strings.EqualFold(strings.TrimSpace(key), name) {
+			return strings.TrimSpace(value)
+		}
+	}
+	return ""
 }
 
 // collectDKIM looks up the common selectors and returns how many lookups
@@ -332,189 +359,88 @@ func (s *scanner) collectDKIM(ctx context.Context, domain string, result *Domain
 	return failed, firstErr
 }
 
+// validateSPF reports whether an SPF record matches RFC 7208's grammar, since
+// receivers return permerror for a syntax error anywhere in it. A record
+// with no mechanism and no redirect or exp modifier, such as a bare v=spf1,
+// also reads as invalid.
 func validateSPF(record string) bool {
-	// Must be a valid SPF record (exact version match)
-	if !isSPFRecord(record) {
-		return false
-	}
-	lower := strings.ToLower(record)
-
-	// SPF mechanisms are space-separated tokens after v=spf1
-	// Valid mechanisms: all, include:, a, a:, a/, mx, mx:, mx/, ip4:, ip6:, exists:, redirect=, ptr, ptr:
-	// Unknown modifiers (name=value where name starts with alpha) are allowed per RFC 7208 §12
-	parts := strings.Fields(lower)
-	if len(parts) < 2 {
-		return false // Just "v=spf1" with no mechanisms
-	}
-
-	hasValidMechanism := false
-	for _, part := range parts[1:] { // Skip v=spf1
-		// Remove qualifier prefix if present (+, -, ~, ?)
-		mechanism := strings.TrimLeft(part, "+-~?")
-
-		// Check for known mechanisms
-		isKnownMechanism := mechanism == "all" ||
-			mechanism == "a" ||
-			mechanism == "mx" ||
-			mechanism == "ptr" ||
-			strings.HasPrefix(mechanism, "include:") ||
-			strings.HasPrefix(mechanism, "a:") ||
-			strings.HasPrefix(mechanism, "a/") ||
-			strings.HasPrefix(mechanism, "mx:") ||
-			strings.HasPrefix(mechanism, "mx/") ||
-			strings.HasPrefix(mechanism, "ip4:") ||
-			strings.HasPrefix(mechanism, "ip6:") ||
-			strings.HasPrefix(mechanism, "exists:") ||
-			strings.HasPrefix(mechanism, "redirect=") ||
-			strings.HasPrefix(mechanism, "ptr:") ||
-			strings.HasPrefix(mechanism, "exp=")
-
-		// Check for unknown modifier: name=value where name starts with alpha
-		// Per RFC 7208 §12: unknown-modifier = name "=" macro-string
-		// name = ALPHA *( ALPHA / DIGIT / "-" / "_" / "." )
-		isUnknownModifier := false
-		if strings.Contains(mechanism, "=") {
-			eqIdx := strings.Index(mechanism, "=")
-			name := mechanism[:eqIdx]
-			if len(name) > 0 && isAlpha(name[0]) && isValidSPFName(name) {
-				isUnknownModifier = true
-			}
-		}
-
-		if isKnownMechanism {
-			hasValidMechanism = true
-		} else if !isUnknownModifier {
-			// Invalid term (not a known mechanism and not an unknown modifier)
-			return false
-		}
-		// Unknown modifiers are valid but don't count as mechanisms
-	}
-	return hasValidMechanism
+	r, err := spf.Parse(record)
+	return err == nil && (len(r.Mechanisms) > 0 || r.Redirect != "" || r.Exp != "")
 }
 
-// isAlpha returns true if c is an ASCII letter.
-func isAlpha(c byte) bool {
-	return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z')
-}
-
-// isDigit returns true if c is an ASCII digit.
-func isDigit(c byte) bool {
-	return c >= '0' && c <= '9'
-}
-
-// isValidSPFName checks if s is a valid SPF name per RFC 7208 §12.
-// name = ALPHA *( ALPHA / DIGIT / "-" / "_" / "." )
-func isValidSPFName(s string) bool {
-	if len(s) == 0 {
-		return false
-	}
-	for i := 0; i < len(s); i++ {
-		c := s[i]
-		if !isAlpha(c) && !isDigit(c) && c != '-' && c != '_' && c != '.' {
-			return false
-		}
-	}
-	return true
-}
-
-func validateDMARC(record string) bool {
-	// Must be a valid DMARC record (exact version match)
-	if !isDMARCRecord(record) {
-		return false
-	}
-	// Parse all tags and validate p= value (sp= is optional and invalid values are ignored per receiver behavior)
-	parts := strings.Split(record, ";")
-	for _, part := range parts {
-		key, value := parseDMARCTag(part)
-		if key == "p" {
-			policy := strings.ToLower(value)
-			// Only valid policy values per RFC 7489
-			return policy == "none" || policy == "quarantine" || policy == "reject"
-		}
-	}
-	return false
-}
-
-// hasInvalidSP checks if a DMARC record contains an sp= tag with an invalid value.
-// Returns true if sp= is present but not one of: none, quarantine, reject.
-// Handles optional whitespace around "=" per RFC 7489 ABNF.
-func hasInvalidSP(record string) bool {
-	parts := strings.Split(record, ";")
-	for _, part := range parts {
-		key, value := parseDMARCTag(part)
-		if key == "sp" {
-			sp := strings.ToLower(value)
-			if sp != "none" && sp != "quarantine" && sp != "reject" {
-				return true
-			}
-		}
-	}
-	return false
-}
-
+// validateDKIM reports whether a DKIM key record's p tag holds key data.
+// RFC 6376 section 3.2 says a tag name given twice makes the whole tag list
+// invalid. Section 3.6.1 says p is base64. Section 2.4 allows whitespace
+// anywhere in it and up to two = signs at the end. An empty p tag means the
+// key was revoked.
 func validateDKIM(record string) bool {
-	// Must be a valid DKIM record and contain a non-empty public key
-	if !isDKIMRecord(record) {
+	key, ok := dkimPublicKey(record)
+	if !ok || repeatsTag(record) {
 		return false
 	}
-	// Check for non-empty p= value
-	lower := strings.ToLower(record)
-	parts := strings.Split(lower, ";")
-	for _, part := range parts {
-		part = strings.TrimSpace(part)
-		if strings.HasPrefix(part, "p=") {
-			key := strings.TrimPrefix(part, "p=")
-			key = strings.TrimSpace(key)
-			return key != "" // Non-empty key
-		}
+	key = strings.Join(strings.Fields(key), "")
+	key = strings.TrimSuffix(strings.TrimSuffix(key, "="), "=")
+	if key == "" {
+		return false
 	}
-	return false
+	_, err := base64.RawStdEncoding.DecodeString(key)
+	return err == nil
 }
 
 // computeAssessment evaluates the records it was given and leaves out what a
 // failed lookup leaves undecided. dkimComplete says whether every DKIM
 // selector's lookup answered.
 func computeAssessment(result *DomainResult, dkimComplete bool) Assessment {
-	spf, dmarc := result.SPF.Record, result.DMARC.Record
+	spfRecord, dmarcRecord := result.SPF.Record, result.DMARC.Record
 	enforced, hasReporting := false, false
 	issues := []string{}
 
 	// Check SPF
-	if spf == nil {
+	if spfRecord == nil {
 		issues = append(issues, "No SPF record")
-	} else if !spf.Valid {
+	} else if !spfRecord.Valid {
 		issues = append(issues, "Invalid SPF record")
 	}
 
 	// Check DMARC
-	if dmarc == nil {
+	if dmarcRecord == nil {
 		issues = append(issues, "No DMARC record")
-	} else if !dmarc.Valid {
+	} else if !dmarcRecord.Valid {
 		issues = append(issues, "Invalid DMARC record")
 	} else {
-		if dmarc.Policy == "reject" && dmarc.Pct == 100 {
+		r := dmarcRecord.parsed
+		// The record's p applies when the record is the domain's own, and
+		// its subdomain policy applies when the record is above it. Under
+		// t=y, receivers apply that policy one level lower.
+		requested, _ := r.Requested(dmarcRecord.above, true)
+		if r.Applied(requested) == dmarc.Reject {
 			enforced = true
-		} else if dmarc.Policy == "none" {
+		}
+		switch requested {
+		case dmarc.None:
 			issues = append(issues, "DMARC policy is 'none' (monitoring only)")
-		} else if dmarc.Policy == "quarantine" {
+		case dmarc.Quarantine:
 			issues = append(issues, "DMARC policy is 'quarantine' (not reject)")
-		} else if dmarc.Pct < 100 {
-			issues = append(issues, "DMARC pct is less than 100%")
+		}
+		if r.Testing && requested != dmarc.None {
+			issues = append(issues, "DMARC policy is in testing mode (t=y), so receivers apply it one level lower")
+		}
+		for _, tag := range []string{"p", "sp", "np"} {
+			if slices.Contains(r.Invalid, tag) && (tag != "p" || r.P == "") {
+				issues = append(issues, "DMARC "+tag+"= tag has an invalid value, so receivers treat the record as p=none")
+			}
 		}
 
-		if dmarc.RUA != "" {
-			hasReporting = true
-		} else {
+		hasReporting = len(r.RUA) > 0
+		if !hasReporting {
 			issues = append(issues, "No DMARC aggregate reporting (rua) configured")
 		}
-
-		if dmarc.SubdomainPolicy != "reject" {
-			issues = append(issues, "Subdomain policy is not 'reject'")
+		if len(r.BadRUA) > 0 {
+			issues = append(issues, "DMARC rua has an address that is not a URI, such as one without mailto:")
 		}
 
-		// Check for invalid sp= value (record is still valid, but sp= is malformed)
-		if hasInvalidSP(dmarc.Record) {
-			issues = append(issues, "DMARC sp= tag has invalid value (ignored, using p= for subdomains)")
+		if dmarcRecord.SubdomainPolicy != "reject" {
+			issues = append(issues, "Subdomain policy is not 'reject'")
 		}
 	}
 
@@ -643,82 +569,62 @@ func isNotFound(err error) bool {
 	return errors.As(err, &dnsErr) && dnsErr.IsNotFound
 }
 
-// isSPFRecord checks if a TXT record is a valid SPF record (exact v=spf1 version).
-func isSPFRecord(record string) bool {
-	lower := strings.ToLower(record)
-	// Must be exactly "v=spf1" followed by space or end of string
-	if lower == "v=spf1" {
-		return true
-	}
-	return strings.HasPrefix(lower, "v=spf1 ")
-}
-
-// parseDMARCTag parses a DMARC tag and returns the key and value.
-// Handles optional whitespace around "=" per RFC 7489 ABNF.
-func parseDMARCTag(tag string) (key, value string) {
-	tag = strings.TrimSpace(tag)
-	idx := strings.Index(tag, "=")
-	if idx == -1 {
-		return "", ""
-	}
-	key = strings.TrimSpace(tag[:idx])
-	value = strings.TrimSpace(tag[idx+1:])
-	return strings.ToLower(key), value
-}
-
-// isDMARCRecord checks if a TXT record is a valid DMARC record (exact v=DMARC1 version).
-// Per RFC 7489 §6.4, the v= tag must be the first tag.
-// Handles optional whitespace around "=" per RFC 7489 ABNF.
-func isDMARCRecord(record string) bool {
-	parts := strings.SplitN(record, ";", 2)
-	if len(parts) == 0 {
-		return false
-	}
-	key, value := parseDMARCTag(parts[0])
-	// v= must be first tag with value "dmarc1" (case-insensitive)
-	return key == "v" && strings.ToLower(value) == "dmarc1"
-}
-
-// isDKIMRecord checks if a TXT record is a valid DKIM record.
-// Per RFC 6376 §3.6.1, if v= is present it MUST be the first tag.
-// The record must also contain a p= tag.
+// isDKIMRecord reports whether a TXT record is a DKIM key record.
 func isDKIMRecord(record string) bool {
-	lower := strings.ToLower(record)
-	parts := strings.Split(lower, ";")
+	_, ok := dkimPublicKey(record)
+	return ok
+}
 
-	hasKey := false
-	versionTagPosition := -1
-
-	for i, part := range parts {
-		part = strings.TrimSpace(part)
-		if part == "v=dkim1" || strings.HasPrefix(part, "v=dkim1 ") {
-			versionTagPosition = i
-		}
-		if strings.HasPrefix(part, "p=") {
-			hasKey = true
-		}
-	}
-
-	// Must have a p= tag
-	if !hasKey {
-		return false
-	}
-
-	// If v= tag is present, it must be the first tag (RFC 6376 §3.6.1)
-	if versionTagPosition > 0 {
-		return false // v= exists but not first
-	}
-
-	// If there's a v= tag that's not v=dkim1, it's not a DKIM record
-	if versionTagPosition == -1 && strings.Contains(lower, "v=") {
-		// Check if there's any other v= tag
-		for _, part := range parts {
-			part = strings.TrimSpace(part)
-			if strings.HasPrefix(part, "v=") && part != "v=dkim1" && !strings.HasPrefix(part, "v=dkim1 ") {
-				return false
+// dkimPublicKey returns the value of a DKIM key record's p tag, and reports
+// false for a TXT record that is not a key record. RFC 6376 section 3.6.1
+// requires the p tag. A v tag must come first and be exactly DKIM1 when it
+// is present. Section 3.2 makes tag names case-sensitive, so P is not the p
+// tag.
+func dkimPublicKey(record string) (string, bool) {
+	key, hasKey := "", false
+	for i, tag := range dkimTags(record) {
+		switch tag.name {
+		case "v":
+			if i > 0 || tag.value != "DKIM1" {
+				return "", false
+			}
+		case "p":
+			if !hasKey {
+				key, hasKey = tag.value, true
 			}
 		}
 	}
+	return key, hasKey
+}
 
-	return true
+// repeatsTag reports whether a DKIM key record has a tag name more than
+// once.
+func repeatsTag(record string) bool {
+	seen := map[string]bool{}
+	for _, tag := range dkimTags(record) {
+		if seen[tag.name] {
+			return true
+		}
+		seen[tag.name] = true
+	}
+	return false
+}
+
+// dkimTag is one tag of a DKIM key record, with its name as written.
+type dkimTag struct{ name, value string }
+
+// dkimTags splits a DKIM key record into tag=value pairs, as RFC 6376
+// section 3.2 says. Semicolons separate the pairs, and whitespace around the
+// equals sign and the value is not part of either. A part with no equals
+// sign is skipped.
+func dkimTags(record string) []dkimTag {
+	var tags []dkimTag
+	for _, part := range strings.Split(record, ";") {
+		name, value, ok := strings.Cut(part, "=")
+		if !ok {
+			continue
+		}
+		tags = append(tags, dkimTag{strings.TrimSpace(name), strings.TrimSpace(value)})
+	}
+	return tags
 }

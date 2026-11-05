@@ -20,6 +20,8 @@ collectors:
 |-------|------|----------|---------|-------------|
 | `domains` | []string | Yes | - | List of email domains to scan |
 
+A domain written in Unicode, such as `bücher.example`, is looked up by its A-label form, `xn--bcher-kva.example`. The domain appears in the artifact as you wrote it.
+
 ## DKIM Selectors
 
 The collector automatically checks these common DKIM selectors for each domain:
@@ -59,7 +61,7 @@ The artifact `artifacts/email-dns.collector-result.json` lists a gap for each va
 | Exit | Code | When |
 |------|------|------|
 | 0 | | The run collected, even if some values were left out |
-| 2 | `config_invalid` | `domains` is missing, empty, or not a list of strings |
+| 2 | `config_invalid` | `domains` is missing, empty, or not a list of strings, or it holds a Unicode domain that is not a valid domain name |
 
 ## Troubleshooting
 

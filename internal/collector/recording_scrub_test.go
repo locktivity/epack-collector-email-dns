@@ -17,8 +17,8 @@ import (
 )
 
 // placeholderDKIMKey stands in for a DKIM public key in a recording. It is
-// the opening every RSA 2048-bit key shares, so it holds no key material,
-// and the collector reads any key that is not empty as a key.
+// the opening every RSA 2048-bit key shares, so it holds no key material.
+// It is base64, so the collector reads it as a key.
 const placeholderDKIMKey = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA"
 
 // dkimKey finds the key a DKIM record publishes after p=.

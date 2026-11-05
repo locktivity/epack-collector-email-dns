@@ -1,11 +1,11 @@
 {
   "artifacts": {
-    "artifacts/email-dns.json": {
+    "artifacts/email-dns.email-dns.json": {
       "/collected_at": {
         "code": [
           {
             "role": "assign",
-            "line": "internal/collector/collector.go:70"
+            "line": "internal/collector/collector.go:83"
           }
         ]
       },
@@ -19,175 +19,11 @@
         "code": [
           {
             "role": "input",
-            "line": "internal/collector/collector.go:17"
+            "line": "internal/collector/collector.go:23"
           },
           {
             "role": "condition",
-            "line": "internal/collector/collector.go:51"
-          },
-          {
-            "role": "input",
-            "line": "internal/collector/collector.go:52"
-          },
-          {
-            "role": "input",
-            "line": "internal/collector/collector.go:156"
-          },
-          {
-            "role": "condition",
-            "line": "internal/collector/collector.go:157"
-          },
-          {
-            "role": "input",
-            "line": "internal/collector/collector.go:158"
-          },
-          {
-            "role": "input",
-            "line": "internal/collector/collector.go:178"
-          },
-          {
-            "role": "condition",
-            "line": "internal/collector/collector.go:179"
-          },
-          {
-            "role": "input",
-            "line": "internal/collector/collector.go:180"
-          },
-          {
-            "role": "input",
-            "line": "internal/collector/collector.go:185"
-          },
-          {
-            "role": "condition",
-            "line": "internal/collector/collector.go:186"
-          },
-          {
-            "role": "condition",
-            "line": "internal/collector/collector.go:187"
-          },
-          {
-            "role": "input",
-            "line": "internal/collector/collector.go:188"
-          },
-          {
-            "role": "condition",
-            "line": "internal/collector/collector.go:192"
-          },
-          {
-            "role": "condition",
-            "line": "internal/collector/collector.go:197"
-          },
-          {
-            "role": "input",
-            "line": "internal/collector/collector.go:202"
-          },
-          {
-            "role": "input",
-            "line": "internal/collector/collector.go:215"
-          },
-          {
-            "role": "condition",
-            "line": "internal/collector/collector.go:216"
-          },
-          {
-            "role": "input",
-            "line": "internal/collector/collector.go:217"
-          },
-          {
-            "role": "input",
-            "line": "internal/collector/collector.go:222"
-          },
-          {
-            "role": "condition",
-            "line": "internal/collector/collector.go:223"
-          },
-          {
-            "role": "condition",
-            "line": "internal/collector/collector.go:224"
-          },
-          {
-            "role": "input",
-            "line": "internal/collector/collector.go:225"
-          },
-          {
-            "role": "condition",
-            "line": "internal/collector/collector.go:229"
-          },
-          {
-            "role": "condition",
-            "line": "internal/collector/collector.go:234"
-          },
-          {
-            "role": "input",
-            "line": "internal/collector/collector.go:238"
-          },
-          {
-            "role": "condition",
-            "line": "internal/collector/collector.go:302"
-          },
-          {
-            "role": "input",
-            "line": "internal/collector/collector.go:304"
-          },
-          {
-            "role": "condition",
-            "line": "internal/collector/collector.go:305"
-          },
-          {
-            "role": "condition",
-            "line": "internal/collector/collector.go:307"
-          },
-          {
-            "role": "input",
-            "line": "internal/collector/collector.go:311"
-          },
-          {
-            "role": "input",
-            "line": "internal/collector/collector.go:624"
-          },
-          {
-            "role": "condition",
-            "line": "internal/collector/collector.go:626"
-          },
-          {
-            "role": "condition",
-            "line": "internal/collector/collector.go:627"
-          },
-          {
-            "role": "input",
-            "line": "internal/collector/collector.go:628"
-          },
-          {
-            "role": "condition",
-            "line": "internal/collector/collector.go:632"
-          },
-          {
-            "role": "assign",
-            "line": "internal/collector/collector.go:637"
-          },
-          {
-            "role": "condition",
-            "line": "internal/collector/handler.go:32"
-          },
-          {
-            "role": "condition",
-            "line": "internal/collector/handler.go:36"
-          },
-          {
-            "role": "input",
-            "line": "internal/collector/handler.go:41"
-          }
-        ]
-      },
-      "/domains/*/assessment": {
-        "code": [
-          {
-            "role": "condition",
-            "line": "internal/collector/collector.go:51"
-          },
-          {
-            "role": "input",
-            "line": "internal/collector/collector.go:52"
+            "line": "internal/collector/collector.go:57"
           },
           {
             "role": "input",
@@ -195,47 +31,39 @@
           },
           {
             "role": "input",
-            "line": "internal/collector/collector.go:118"
-          },
-          {
-            "role": "assign",
-            "line": "internal/collector/collector.go:119"
-          },
-          {
-            "role": "helper",
-            "line": "internal/collector/collector.go:477",
-            "end": 547
-          },
-          {
-            "role": "input",
-            "line": "internal/collector/handler.go:31"
-          },
-          {
-            "role": "condition",
-            "line": "internal/collector/handler.go:32"
-          },
-          {
-            "role": "condition",
-            "line": "internal/collector/handler.go:36"
-          },
-          {
-            "role": "input",
-            "line": "internal/collector/handler.go:41"
-          }
-        ]
-      },
-      "/domains/*/assessment/enforced": {
-        "operations": [
-          "dns.dmarc.lookup"
-        ],
-        "code": [
-          {
-            "role": "condition",
-            "line": "internal/collector/collector.go:179"
-          },
-          {
-            "role": "input",
             "line": "internal/collector/collector.go:183"
+          },
+          {
+            "role": "condition",
+            "line": "internal/collector/collector.go:184"
+          },
+          {
+            "role": "input",
+            "line": "internal/collector/collector.go:185"
+          },
+          {
+            "role": "input",
+            "line": "internal/collector/collector.go:205"
+          },
+          {
+            "role": "condition",
+            "line": "internal/collector/collector.go:206"
+          },
+          {
+            "role": "input",
+            "line": "internal/collector/collector.go:207"
+          },
+          {
+            "role": "input",
+            "line": "internal/collector/collector.go:212"
+          },
+          {
+            "role": "condition",
+            "line": "internal/collector/collector.go:213"
+          },
+          {
+            "role": "condition",
+            "line": "internal/collector/collector.go:214"
           },
           {
             "role": "input",
@@ -243,19 +71,7 @@
           },
           {
             "role": "condition",
-            "line": "internal/collector/collector.go:216"
-          },
-          {
-            "role": "input",
-            "line": "internal/collector/collector.go:220"
-          },
-          {
-            "role": "input",
-            "line": "internal/collector/collector.go:222"
-          },
-          {
-            "role": "condition",
-            "line": "internal/collector/collector.go:223"
+            "line": "internal/collector/collector.go:219"
           },
           {
             "role": "condition",
@@ -263,59 +79,31 @@
           },
           {
             "role": "input",
-            "line": "internal/collector/collector.go:225"
-          },
-          {
-            "role": "condition",
             "line": "internal/collector/collector.go:229"
           },
           {
-            "role": "condition",
-            "line": "internal/collector/collector.go:234"
+            "role": "input",
+            "line": "internal/collector/collector.go:244"
           },
           {
             "role": "input",
-            "line": "internal/collector/collector.go:235"
+            "line": "internal/collector/collector.go:245"
           },
           {
             "role": "input",
-            "line": "internal/collector/collector.go:236"
-          },
-          {
-            "role": "input",
-            "line": "internal/collector/collector.go:237"
-          },
-          {
-            "role": "input",
-            "line": "internal/collector/collector.go:242"
-          },
-          {
-            "role": "input",
-            "line": "internal/collector/collector.go:249"
+            "line": "internal/collector/collector.go:247"
           },
           {
             "role": "input",
             "line": "internal/collector/collector.go:250"
           },
           {
-            "role": "input",
-            "line": "internal/collector/collector.go:253"
-          },
-          {
             "role": "condition",
-            "line": "internal/collector/collector.go:254"
+            "line": "internal/collector/collector.go:251"
           },
           {
             "role": "input",
-            "line": "internal/collector/collector.go:255"
-          },
-          {
-            "role": "condition",
-            "line": "internal/collector/collector.go:257"
-          },
-          {
-            "role": "condition",
-            "line": "internal/collector/collector.go:258"
+            "line": "internal/collector/collector.go:252"
           },
           {
             "role": "input",
@@ -330,56 +118,240 @@
             "line": "internal/collector/collector.go:261"
           },
           {
-            "role": "input",
-            "line": "internal/collector/collector.go:263"
-          },
-          {
             "role": "condition",
-            "line": "internal/collector/collector.go:272"
-          },
-          {
-            "role": "condition",
-            "line": "internal/collector/collector.go:273"
+            "line": "internal/collector/collector.go:329"
           },
           {
             "role": "input",
-            "line": "internal/collector/collector.go:274"
+            "line": "internal/collector/collector.go:331"
+          },
+          {
+            "role": "condition",
+            "line": "internal/collector/collector.go:332"
+          },
+          {
+            "role": "condition",
+            "line": "internal/collector/collector.go:334"
           },
           {
             "role": "input",
-            "line": "internal/collector/collector.go:478"
+            "line": "internal/collector/collector.go:338"
           },
           {
             "role": "input",
-            "line": "internal/collector/collector.go:479"
+            "line": "internal/collector/collector.go:550"
           },
           {
             "role": "condition",
-            "line": "internal/collector/collector.go:490"
+            "line": "internal/collector/collector.go:552"
           },
           {
             "role": "condition",
-            "line": "internal/collector/collector.go:492"
-          },
-          {
-            "role": "condition",
-            "line": "internal/collector/collector.go:495"
+            "line": "internal/collector/collector.go:553"
           },
           {
             "role": "input",
-            "line": "internal/collector/collector.go:496"
+            "line": "internal/collector/collector.go:554"
           },
           {
             "role": "condition",
-            "line": "internal/collector/collector.go:538"
+            "line": "internal/collector/collector.go:558"
           },
           {
             "role": "assign",
-            "line": "internal/collector/collector.go:539"
+            "line": "internal/collector/collector.go:563"
+          },
+          {
+            "role": "input",
+            "line": "internal/collector/handler.go:36"
+          },
+          {
+            "role": "condition",
+            "line": "internal/collector/handler.go:37"
+          },
+          {
+            "role": "condition",
+            "line": "internal/collector/handler.go:41"
+          },
+          {
+            "role": "input",
+            "line": "internal/collector/handler.go:51"
+          }
+        ]
+      },
+      "/domains/*/assessment": {
+        "code": [
+          {
+            "role": "condition",
+            "line": "internal/collector/collector.go:57"
+          },
+          {
+            "role": "input",
+            "line": "internal/collector/collector.go:58"
+          },
+          {
+            "role": "condition",
+            "line": "internal/collector/collector.go:59"
+          },
+          {
+            "role": "input",
+            "line": "internal/collector/collector.go:62"
+          },
+          {
+            "role": "input",
+            "line": "internal/collector/collector.go:64"
+          },
+          {
+            "role": "input",
+            "line": "internal/collector/collector.go:65"
+          },
+          {
+            "role": "input",
+            "line": "internal/collector/collector.go:78"
+          },
+          {
+            "role": "input",
+            "line": "internal/collector/collector.go:145"
+          },
+          {
+            "role": "assign",
+            "line": "internal/collector/collector.go:146"
+          },
+          {
+            "role": "helper",
+            "line": "internal/collector/collector.go:393",
+            "end": 473
+          },
+          {
+            "role": "input",
+            "line": "internal/collector/handler.go:36"
+          },
+          {
+            "role": "condition",
+            "line": "internal/collector/handler.go:37"
+          },
+          {
+            "role": "condition",
+            "line": "internal/collector/handler.go:41"
+          },
+          {
+            "role": "input",
+            "line": "internal/collector/handler.go:51"
+          }
+        ]
+      },
+      "/domains/*/assessment/enforced": {
+        "operations": [
+          "dns.dmarc.lookup"
+        ],
+        "code": [
+          {
+            "role": "condition",
+            "line": "internal/collector/collector.go:206"
+          },
+          {
+            "role": "input",
+            "line": "internal/collector/collector.go:210"
+          },
+          {
+            "role": "condition",
+            "line": "internal/collector/collector.go:251"
+          },
+          {
+            "role": "input",
+            "line": "internal/collector/collector.go:255"
+          },
+          {
+            "role": "input",
+            "line": "internal/collector/collector.go:259"
+          },
+          {
+            "role": "condition",
+            "line": "internal/collector/collector.go:263"
+          },
+          {
+            "role": "input",
+            "line": "internal/collector/collector.go:266"
+          },
+          {
+            "role": "input",
+            "line": "internal/collector/collector.go:267"
+          },
+          {
+            "role": "input",
+            "line": "internal/collector/collector.go:268"
+          },
+          {
+            "role": "input",
+            "line": "internal/collector/collector.go:294"
+          },
+          {
+            "role": "condition",
+            "line": "internal/collector/collector.go:302"
+          },
+          {
+            "role": "input",
+            "line": "internal/collector/collector.go:304"
+          },
+          {
+            "role": "input",
+            "line": "internal/collector/collector.go:394"
+          },
+          {
+            "role": "input",
+            "line": "internal/collector/collector.go:395"
+          },
+          {
+            "role": "condition",
+            "line": "internal/collector/collector.go:406"
+          },
+          {
+            "role": "condition",
+            "line": "internal/collector/collector.go:408"
+          },
+          {
+            "role": "input",
+            "line": "internal/collector/collector.go:415"
+          },
+          {
+            "role": "condition",
+            "line": "internal/collector/collector.go:416"
+          },
+          {
+            "role": "input",
+            "line": "internal/collector/collector.go:417"
+          },
+          {
+            "role": "condition",
+            "line": "internal/collector/collector.go:464"
+          },
+          {
+            "role": "assign",
+            "line": "internal/collector/collector.go:465"
+          },
+          {
+            "role": "condition",
+            "line": "internal/dmarc/dmarc.go:287"
+          },
+          {
+            "role": "condition",
+            "line": "internal/dmarc/dmarc.go:290"
+          },
+          {
+            "role": "input",
+            "line": "internal/dmarc/dmarc.go:291"
+          },
+          {
+            "role": "condition",
+            "line": "internal/dmarc/dmarc.go:318"
+          },
+          {
+            "role": "input",
+            "line": "internal/dmarc/dmarc.go:337"
           }
         ],
         "gaps": [
-          "internal/collector/collector.go:129"
+          "internal/collector/collector.go:156"
         ]
       },
       "/domains/*/assessment/has_reporting": {
@@ -389,127 +361,111 @@
         "code": [
           {
             "role": "condition",
-            "line": "internal/collector/collector.go:179"
+            "line": "internal/collector/collector.go:206"
           },
           {
             "role": "input",
-            "line": "internal/collector/collector.go:183"
-          },
-          {
-            "role": "input",
-            "line": "internal/collector/collector.go:215"
+            "line": "internal/collector/collector.go:210"
           },
           {
             "role": "condition",
-            "line": "internal/collector/collector.go:216"
-          },
-          {
-            "role": "input",
-            "line": "internal/collector/collector.go:220"
-          },
-          {
-            "role": "input",
-            "line": "internal/collector/collector.go:222"
-          },
-          {
-            "role": "condition",
-            "line": "internal/collector/collector.go:223"
-          },
-          {
-            "role": "condition",
-            "line": "internal/collector/collector.go:224"
-          },
-          {
-            "role": "input",
-            "line": "internal/collector/collector.go:225"
-          },
-          {
-            "role": "condition",
-            "line": "internal/collector/collector.go:229"
-          },
-          {
-            "role": "condition",
-            "line": "internal/collector/collector.go:234"
-          },
-          {
-            "role": "input",
-            "line": "internal/collector/collector.go:235"
-          },
-          {
-            "role": "input",
-            "line": "internal/collector/collector.go:236"
-          },
-          {
-            "role": "input",
-            "line": "internal/collector/collector.go:237"
-          },
-          {
-            "role": "input",
-            "line": "internal/collector/collector.go:242"
-          },
-          {
-            "role": "input",
-            "line": "internal/collector/collector.go:250"
-          },
-          {
-            "role": "input",
-            "line": "internal/collector/collector.go:253"
-          },
-          {
-            "role": "condition",
-            "line": "internal/collector/collector.go:254"
+            "line": "internal/collector/collector.go:251"
           },
           {
             "role": "input",
             "line": "internal/collector/collector.go:255"
           },
           {
-            "role": "condition",
-            "line": "internal/collector/collector.go:257"
+            "role": "input",
+            "line": "internal/collector/collector.go:259"
           },
           {
             "role": "condition",
-            "line": "internal/collector/collector.go:277"
+            "line": "internal/collector/collector.go:263"
           },
           {
             "role": "input",
-            "line": "internal/collector/collector.go:279"
+            "line": "internal/collector/collector.go:266"
           },
           {
             "role": "input",
-            "line": "internal/collector/collector.go:478"
+            "line": "internal/collector/collector.go:267"
           },
           {
             "role": "input",
-            "line": "internal/collector/collector.go:479"
+            "line": "internal/collector/collector.go:268"
           },
           {
             "role": "condition",
-            "line": "internal/collector/collector.go:490"
-          },
-          {
-            "role": "condition",
-            "line": "internal/collector/collector.go:492"
-          },
-          {
-            "role": "condition",
-            "line": "internal/collector/collector.go:505"
+            "line": "internal/collector/collector.go:302"
           },
           {
             "role": "input",
-            "line": "internal/collector/collector.go:506"
+            "line": "internal/collector/collector.go:304"
+          },
+          {
+            "role": "input",
+            "line": "internal/collector/collector.go:394"
+          },
+          {
+            "role": "input",
+            "line": "internal/collector/collector.go:395"
           },
           {
             "role": "condition",
-            "line": "internal/collector/collector.go:538"
+            "line": "internal/collector/collector.go:406"
+          },
+          {
+            "role": "condition",
+            "line": "internal/collector/collector.go:408"
+          },
+          {
+            "role": "input",
+            "line": "internal/collector/collector.go:434"
+          },
+          {
+            "role": "condition",
+            "line": "internal/collector/collector.go:464"
           },
           {
             "role": "assign",
-            "line": "internal/collector/collector.go:539"
+            "line": "internal/collector/collector.go:465"
+          },
+          {
+            "role": "condition",
+            "line": "internal/dmarc/dmarc.go:114"
+          },
+          {
+            "role": "condition",
+            "line": "internal/dmarc/dmarc.go:152"
+          },
+          {
+            "role": "input",
+            "line": "internal/dmarc/dmarc.go:153"
+          },
+          {
+            "role": "condition",
+            "line": "internal/dmarc/dmarc.go:287"
+          },
+          {
+            "role": "condition",
+            "line": "internal/dmarc/dmarc.go:290"
+          },
+          {
+            "role": "input",
+            "line": "internal/dmarc/dmarc.go:291"
+          },
+          {
+            "role": "condition",
+            "line": "internal/dmarc/dmarc.go:318"
+          },
+          {
+            "role": "input",
+            "line": "internal/dmarc/dmarc.go:337"
           }
         ],
         "gaps": [
-          "internal/collector/collector.go:130"
+          "internal/collector/collector.go:157"
         ]
       },
       "/domains/*/assessment/issues": {
@@ -521,167 +477,167 @@
         "code": [
           {
             "role": "condition",
-            "line": "internal/collector/collector.go:179"
+            "line": "internal/collector/collector.go:206"
           },
           {
             "role": "input",
-            "line": "internal/collector/collector.go:183"
+            "line": "internal/collector/collector.go:210"
           },
           {
             "role": "condition",
-            "line": "internal/collector/collector.go:192"
-          },
-          {
-            "role": "condition",
-            "line": "internal/collector/collector.go:197"
+            "line": "internal/collector/collector.go:251"
           },
           {
             "role": "input",
-            "line": "internal/collector/collector.go:200"
-          },
-          {
-            "role": "condition",
-            "line": "internal/collector/collector.go:216"
+            "line": "internal/collector/collector.go:255"
           },
           {
             "role": "input",
-            "line": "internal/collector/collector.go:220"
+            "line": "internal/collector/collector.go:394"
           },
           {
             "role": "input",
-            "line": "internal/collector/collector.go:478"
+            "line": "internal/collector/collector.go:396"
+          },
+          {
+            "role": "condition",
+            "line": "internal/collector/collector.go:399"
           },
           {
             "role": "input",
-            "line": "internal/collector/collector.go:480"
+            "line": "internal/collector/collector.go:400"
           },
           {
             "role": "condition",
-            "line": "internal/collector/collector.go:483"
+            "line": "internal/collector/collector.go:401"
           },
           {
             "role": "input",
-            "line": "internal/collector/collector.go:484"
+            "line": "internal/collector/collector.go:402"
           },
           {
             "role": "condition",
-            "line": "internal/collector/collector.go:485"
+            "line": "internal/collector/collector.go:406"
           },
           {
             "role": "input",
-            "line": "internal/collector/collector.go:486"
+            "line": "internal/collector/collector.go:407"
           },
           {
             "role": "condition",
-            "line": "internal/collector/collector.go:490"
+            "line": "internal/collector/collector.go:408"
           },
           {
             "role": "input",
-            "line": "internal/collector/collector.go:491"
+            "line": "internal/collector/collector.go:409"
           },
           {
             "role": "condition",
-            "line": "internal/collector/collector.go:492"
+            "line": "internal/collector/collector.go:419"
+          },
+          {
+            "role": "condition",
+            "line": "internal/collector/collector.go:420"
           },
           {
             "role": "input",
-            "line": "internal/collector/collector.go:493"
+            "line": "internal/collector/collector.go:421"
           },
           {
             "role": "condition",
-            "line": "internal/collector/collector.go:495"
-          },
-          {
-            "role": "condition",
-            "line": "internal/collector/collector.go:497"
+            "line": "internal/collector/collector.go:422"
           },
           {
             "role": "input",
-            "line": "internal/collector/collector.go:498"
+            "line": "internal/collector/collector.go:423"
           },
           {
             "role": "condition",
-            "line": "internal/collector/collector.go:499"
+            "line": "internal/collector/collector.go:425"
           },
           {
             "role": "input",
-            "line": "internal/collector/collector.go:500"
+            "line": "internal/collector/collector.go:426"
           },
           {
             "role": "condition",
-            "line": "internal/collector/collector.go:501"
+            "line": "internal/collector/collector.go:428"
+          },
+          {
+            "role": "condition",
+            "line": "internal/collector/collector.go:429"
           },
           {
             "role": "input",
-            "line": "internal/collector/collector.go:502"
+            "line": "internal/collector/collector.go:430"
           },
           {
             "role": "condition",
-            "line": "internal/collector/collector.go:505"
+            "line": "internal/collector/collector.go:435"
           },
           {
             "role": "input",
-            "line": "internal/collector/collector.go:508"
+            "line": "internal/collector/collector.go:436"
           },
           {
             "role": "condition",
-            "line": "internal/collector/collector.go:511"
+            "line": "internal/collector/collector.go:438"
           },
           {
             "role": "input",
-            "line": "internal/collector/collector.go:512"
+            "line": "internal/collector/collector.go:439"
           },
           {
             "role": "condition",
-            "line": "internal/collector/collector.go:516"
+            "line": "internal/collector/collector.go:442"
           },
           {
             "role": "input",
-            "line": "internal/collector/collector.go:517"
+            "line": "internal/collector/collector.go:443"
           },
           {
             "role": "input",
-            "line": "internal/collector/collector.go:522"
+            "line": "internal/collector/collector.go:448"
           },
           {
             "role": "condition",
-            "line": "internal/collector/collector.go:523"
+            "line": "internal/collector/collector.go:449"
           },
           {
             "role": "input",
-            "line": "internal/collector/collector.go:524"
+            "line": "internal/collector/collector.go:450"
           },
           {
             "role": "condition",
-            "line": "internal/collector/collector.go:526"
+            "line": "internal/collector/collector.go:452"
           },
           {
             "role": "condition",
-            "line": "internal/collector/collector.go:527"
+            "line": "internal/collector/collector.go:453"
           },
           {
             "role": "input",
-            "line": "internal/collector/collector.go:528"
+            "line": "internal/collector/collector.go:454"
           },
           {
             "role": "condition",
-            "line": "internal/collector/collector.go:532"
+            "line": "internal/collector/collector.go:458"
           },
           {
             "role": "input",
-            "line": "internal/collector/collector.go:533"
+            "line": "internal/collector/collector.go:459"
           },
           {
             "role": "condition",
-            "line": "internal/collector/collector.go:543"
+            "line": "internal/collector/collector.go:469"
           },
           {
             "role": "assign",
-            "line": "internal/collector/collector.go:544"
+            "line": "internal/collector/collector.go:470"
           }
         ],
         "gaps": [
-          "internal/collector/collector.go:139"
+          "internal/collector/collector.go:166"
         ]
       },
       "/domains/*/assessment/issues/*": {
@@ -693,167 +649,167 @@
         "code": [
           {
             "role": "condition",
-            "line": "internal/collector/collector.go:179"
+            "line": "internal/collector/collector.go:206"
           },
           {
             "role": "input",
-            "line": "internal/collector/collector.go:183"
+            "line": "internal/collector/collector.go:210"
           },
           {
             "role": "condition",
-            "line": "internal/collector/collector.go:192"
-          },
-          {
-            "role": "condition",
-            "line": "internal/collector/collector.go:197"
+            "line": "internal/collector/collector.go:251"
           },
           {
             "role": "input",
-            "line": "internal/collector/collector.go:200"
-          },
-          {
-            "role": "condition",
-            "line": "internal/collector/collector.go:216"
+            "line": "internal/collector/collector.go:255"
           },
           {
             "role": "input",
-            "line": "internal/collector/collector.go:220"
+            "line": "internal/collector/collector.go:394"
           },
           {
             "role": "input",
-            "line": "internal/collector/collector.go:478"
+            "line": "internal/collector/collector.go:396"
+          },
+          {
+            "role": "condition",
+            "line": "internal/collector/collector.go:399"
           },
           {
             "role": "input",
-            "line": "internal/collector/collector.go:480"
+            "line": "internal/collector/collector.go:400"
           },
           {
             "role": "condition",
-            "line": "internal/collector/collector.go:483"
+            "line": "internal/collector/collector.go:401"
           },
           {
             "role": "input",
-            "line": "internal/collector/collector.go:484"
+            "line": "internal/collector/collector.go:402"
           },
           {
             "role": "condition",
-            "line": "internal/collector/collector.go:485"
+            "line": "internal/collector/collector.go:406"
           },
           {
             "role": "input",
-            "line": "internal/collector/collector.go:486"
+            "line": "internal/collector/collector.go:407"
           },
           {
             "role": "condition",
-            "line": "internal/collector/collector.go:490"
+            "line": "internal/collector/collector.go:408"
           },
           {
             "role": "input",
-            "line": "internal/collector/collector.go:491"
+            "line": "internal/collector/collector.go:409"
           },
           {
             "role": "condition",
-            "line": "internal/collector/collector.go:492"
+            "line": "internal/collector/collector.go:419"
+          },
+          {
+            "role": "condition",
+            "line": "internal/collector/collector.go:420"
           },
           {
             "role": "input",
-            "line": "internal/collector/collector.go:493"
+            "line": "internal/collector/collector.go:421"
           },
           {
             "role": "condition",
-            "line": "internal/collector/collector.go:495"
-          },
-          {
-            "role": "condition",
-            "line": "internal/collector/collector.go:497"
+            "line": "internal/collector/collector.go:422"
           },
           {
             "role": "input",
-            "line": "internal/collector/collector.go:498"
+            "line": "internal/collector/collector.go:423"
           },
           {
             "role": "condition",
-            "line": "internal/collector/collector.go:499"
+            "line": "internal/collector/collector.go:425"
           },
           {
             "role": "input",
-            "line": "internal/collector/collector.go:500"
+            "line": "internal/collector/collector.go:426"
           },
           {
             "role": "condition",
-            "line": "internal/collector/collector.go:501"
+            "line": "internal/collector/collector.go:428"
+          },
+          {
+            "role": "condition",
+            "line": "internal/collector/collector.go:429"
           },
           {
             "role": "input",
-            "line": "internal/collector/collector.go:502"
+            "line": "internal/collector/collector.go:430"
           },
           {
             "role": "condition",
-            "line": "internal/collector/collector.go:505"
+            "line": "internal/collector/collector.go:435"
           },
           {
             "role": "input",
-            "line": "internal/collector/collector.go:508"
+            "line": "internal/collector/collector.go:436"
           },
           {
             "role": "condition",
-            "line": "internal/collector/collector.go:511"
+            "line": "internal/collector/collector.go:438"
           },
           {
             "role": "input",
-            "line": "internal/collector/collector.go:512"
+            "line": "internal/collector/collector.go:439"
           },
           {
             "role": "condition",
-            "line": "internal/collector/collector.go:516"
+            "line": "internal/collector/collector.go:442"
           },
           {
             "role": "input",
-            "line": "internal/collector/collector.go:517"
+            "line": "internal/collector/collector.go:443"
           },
           {
             "role": "input",
-            "line": "internal/collector/collector.go:522"
+            "line": "internal/collector/collector.go:448"
           },
           {
             "role": "condition",
-            "line": "internal/collector/collector.go:523"
+            "line": "internal/collector/collector.go:449"
           },
           {
             "role": "input",
-            "line": "internal/collector/collector.go:524"
+            "line": "internal/collector/collector.go:450"
           },
           {
             "role": "condition",
-            "line": "internal/collector/collector.go:526"
+            "line": "internal/collector/collector.go:452"
           },
           {
             "role": "condition",
-            "line": "internal/collector/collector.go:527"
+            "line": "internal/collector/collector.go:453"
           },
           {
             "role": "input",
-            "line": "internal/collector/collector.go:528"
+            "line": "internal/collector/collector.go:454"
           },
           {
             "role": "condition",
-            "line": "internal/collector/collector.go:532"
+            "line": "internal/collector/collector.go:458"
           },
           {
             "role": "input",
-            "line": "internal/collector/collector.go:533"
+            "line": "internal/collector/collector.go:459"
           },
           {
             "role": "condition",
-            "line": "internal/collector/collector.go:543"
+            "line": "internal/collector/collector.go:469"
           },
           {
             "role": "assign",
-            "line": "internal/collector/collector.go:544"
+            "line": "internal/collector/collector.go:470"
           }
         ],
         "gaps": [
-          "internal/collector/collector.go:139"
+          "internal/collector/collector.go:166"
         ]
       },
       "/domains/*/dkim": {
@@ -863,64 +819,64 @@
         "code": [
           {
             "role": "input",
-            "line": "internal/collector/collector.go:17"
+            "line": "internal/collector/collector.go:23"
           },
           {
             "role": "input",
-            "line": "internal/collector/collector.go:298"
+            "line": "internal/collector/collector.go:325"
           },
           {
             "role": "input",
-            "line": "internal/collector/collector.go:299"
-          },
-          {
-            "role": "condition",
-            "line": "internal/collector/collector.go:302"
-          },
-          {
-            "role": "input",
-            "line": "internal/collector/collector.go:303"
-          },
-          {
-            "role": "input",
-            "line": "internal/collector/collector.go:304"
-          },
-          {
-            "role": "condition",
-            "line": "internal/collector/collector.go:305"
-          },
-          {
-            "role": "condition",
-            "line": "internal/collector/collector.go:307"
-          },
-          {
-            "role": "input",
-            "line": "internal/collector/collector.go:312"
-          },
-          {
-            "role": "condition",
-            "line": "internal/collector/collector.go:317"
-          },
-          {
-            "role": "condition",
-            "line": "internal/collector/collector.go:318"
-          },
-          {
-            "role": "input",
-            "line": "internal/collector/collector.go:319"
+            "line": "internal/collector/collector.go:326"
           },
           {
             "role": "condition",
             "line": "internal/collector/collector.go:329"
           },
           {
-            "role": "assign",
+            "role": "input",
             "line": "internal/collector/collector.go:330"
+          },
+          {
+            "role": "input",
+            "line": "internal/collector/collector.go:331"
+          },
+          {
+            "role": "condition",
+            "line": "internal/collector/collector.go:332"
+          },
+          {
+            "role": "condition",
+            "line": "internal/collector/collector.go:334"
+          },
+          {
+            "role": "input",
+            "line": "internal/collector/collector.go:339"
+          },
+          {
+            "role": "condition",
+            "line": "internal/collector/collector.go:344"
+          },
+          {
+            "role": "condition",
+            "line": "internal/collector/collector.go:345"
+          },
+          {
+            "role": "input",
+            "line": "internal/collector/collector.go:346"
+          },
+          {
+            "role": "condition",
+            "line": "internal/collector/collector.go:356"
+          },
+          {
+            "role": "assign",
+            "line": "internal/collector/collector.go:357"
           }
         ],
         "gaps": [
-          "internal/collector/collector.go:134",
-          "internal/collector/collector.go:136"
+          "internal/collector/collector.go:161",
+          "internal/collector/collector.go:163"
         ]
       },
       "/domains/*/dkim/*/record": {
@@ -930,40 +886,40 @@
         "code": [
           {
             "role": "input",
-            "line": "internal/collector/collector.go:17"
+            "line": "internal/collector/collector.go:23"
           },
           {
             "role": "condition",
-            "line": "internal/collector/collector.go:302"
+            "line": "internal/collector/collector.go:329"
           },
           {
             "role": "input",
-            "line": "internal/collector/collector.go:303"
+            "line": "internal/collector/collector.go:330"
           },
           {
             "role": "input",
-            "line": "internal/collector/collector.go:304"
+            "line": "internal/collector/collector.go:331"
           },
           {
             "role": "condition",
-            "line": "internal/collector/collector.go:305"
+            "line": "internal/collector/collector.go:332"
           },
           {
             "role": "condition",
-            "line": "internal/collector/collector.go:317"
+            "line": "internal/collector/collector.go:344"
           },
           {
             "role": "condition",
-            "line": "internal/collector/collector.go:318"
+            "line": "internal/collector/collector.go:345"
           },
           {
             "role": "assign",
-            "line": "internal/collector/collector.go:321"
+            "line": "internal/collector/collector.go:348"
           }
         ],
         "gaps": [
-          "internal/collector/collector.go:134",
-          "internal/collector/collector.go:136"
+          "internal/collector/collector.go:161",
+          "internal/collector/collector.go:163"
         ]
       },
       "/domains/*/dkim/*/selector": {
@@ -973,40 +929,40 @@
         "code": [
           {
             "role": "input",
-            "line": "internal/collector/collector.go:17"
+            "line": "internal/collector/collector.go:23"
           },
           {
             "role": "condition",
-            "line": "internal/collector/collector.go:302"
+            "line": "internal/collector/collector.go:329"
           },
           {
             "role": "input",
-            "line": "internal/collector/collector.go:303"
+            "line": "internal/collector/collector.go:330"
           },
           {
             "role": "input",
-            "line": "internal/collector/collector.go:304"
+            "line": "internal/collector/collector.go:331"
           },
           {
             "role": "condition",
-            "line": "internal/collector/collector.go:305"
+            "line": "internal/collector/collector.go:332"
           },
           {
             "role": "condition",
-            "line": "internal/collector/collector.go:317"
+            "line": "internal/collector/collector.go:344"
           },
           {
             "role": "condition",
-            "line": "internal/collector/collector.go:318"
+            "line": "internal/collector/collector.go:345"
           },
           {
             "role": "assign",
-            "line": "internal/collector/collector.go:320"
+            "line": "internal/collector/collector.go:347"
           }
         ],
         "gaps": [
-          "internal/collector/collector.go:134",
-          "internal/collector/collector.go:136"
+          "internal/collector/collector.go:161",
+          "internal/collector/collector.go:163"
         ]
       },
       "/domains/*/dkim/*/valid": {
@@ -1016,7 +972,299 @@
         "code": [
           {
             "role": "input",
-            "line": "internal/collector/collector.go:17"
+            "line": "internal/collector/collector.go:23"
+          },
+          {
+            "role": "condition",
+            "line": "internal/collector/collector.go:329"
+          },
+          {
+            "role": "input",
+            "line": "internal/collector/collector.go:330"
+          },
+          {
+            "role": "input",
+            "line": "internal/collector/collector.go:331"
+          },
+          {
+            "role": "condition",
+            "line": "internal/collector/collector.go:332"
+          },
+          {
+            "role": "condition",
+            "line": "internal/collector/collector.go:344"
+          },
+          {
+            "role": "condition",
+            "line": "internal/collector/collector.go:345"
+          },
+          {
+            "role": "assign",
+            "line": "internal/collector/collector.go:349"
+          },
+          {
+            "role": "helper",
+            "line": "internal/collector/collector.go:376",
+            "end": 388
+          }
+        ],
+        "gaps": [
+          "internal/collector/collector.go:161",
+          "internal/collector/collector.go:163"
+        ]
+      },
+      "/domains/*/dmarc": {
+        "operations": [
+          "dns.dmarc.lookup"
+        ],
+        "code": [
+          {
+            "role": "input",
+            "line": "internal/collector/collector.go:244"
+          },
+          {
+            "role": "input",
+            "line": "internal/collector/collector.go:246"
+          },
+          {
+            "role": "input",
+            "line": "internal/collector/collector.go:247"
+          },
+          {
+            "role": "condition",
+            "line": "internal/collector/collector.go:251"
+          },
+          {
+            "role": "input",
+            "line": "internal/collector/collector.go:259"
+          },
+          {
+            "role": "condition",
+            "line": "internal/collector/collector.go:263"
+          },
+          {
+            "role": "input",
+            "line": "internal/collector/collector.go:266"
+          },
+          {
+            "role": "input",
+            "line": "internal/collector/collector.go:267"
+          },
+          {
+            "role": "assign",
+            "line": "internal/collector/collector.go:268"
+          },
+          {
+            "role": "helper",
+            "line": "internal/collector/collector.go:285",
+            "end": 307
+          },
+          {
+            "role": "input",
+            "line": "internal/dmarc/dmarc.go:280"
+          },
+          {
+            "role": "input",
+            "line": "internal/dmarc/dmarc.go:281"
+          },
+          {
+            "role": "input",
+            "line": "internal/dmarc/dmarc.go:282"
+          },
+          {
+            "role": "input",
+            "line": "internal/dmarc/dmarc.go:283"
+          },
+          {
+            "role": "input",
+            "line": "internal/dmarc/dmarc.go:286"
+          },
+          {
+            "role": "condition",
+            "line": "internal/dmarc/dmarc.go:287"
+          },
+          {
+            "role": "input",
+            "line": "internal/dmarc/dmarc.go:288"
+          },
+          {
+            "role": "condition",
+            "line": "internal/dmarc/dmarc.go:290"
+          },
+          {
+            "role": "input",
+            "line": "internal/dmarc/dmarc.go:291"
+          },
+          {
+            "role": "input",
+            "line": "internal/dmarc/dmarc.go:293"
+          },
+          {
+            "role": "condition",
+            "line": "internal/dmarc/dmarc.go:294"
+          },
+          {
+            "role": "input",
+            "line": "internal/dmarc/dmarc.go:295"
+          },
+          {
+            "role": "input",
+            "line": "internal/dmarc/dmarc.go:297"
+          },
+          {
+            "role": "input",
+            "line": "internal/dmarc/dmarc.go:303"
+          },
+          {
+            "role": "condition",
+            "line": "internal/dmarc/dmarc.go:304"
+          },
+          {
+            "role": "input",
+            "line": "internal/dmarc/dmarc.go:305"
+          },
+          {
+            "role": "input",
+            "line": "internal/dmarc/dmarc.go:306"
+          },
+          {
+            "role": "condition",
+            "line": "internal/dmarc/dmarc.go:307"
+          },
+          {
+            "role": "input",
+            "line": "internal/dmarc/dmarc.go:308"
+          },
+          {
+            "role": "condition",
+            "line": "internal/dmarc/dmarc.go:310"
+          },
+          {
+            "role": "input",
+            "line": "internal/dmarc/dmarc.go:313"
+          },
+          {
+            "role": "condition",
+            "line": "internal/dmarc/dmarc.go:318"
+          },
+          {
+            "role": "input",
+            "line": "internal/dmarc/dmarc.go:319"
+          },
+          {
+            "role": "input",
+            "line": "internal/dmarc/dmarc.go:337"
+          }
+        ],
+        "gaps": [
+          "internal/collector/collector.go:155"
+        ]
+      },
+      "/domains/*/dmarc/pct": {
+        "operations": [
+          "dns.dmarc.lookup"
+        ],
+        "code": [
+          {
+            "role": "assign",
+            "line": "internal/collector/collector.go:290"
+          },
+          {
+            "role": "condition",
+            "line": "internal/collector/collector.go:296"
+          },
+          {
+            "role": "assign",
+            "line": "internal/collector/collector.go:297"
+          },
+          {
+            "role": "condition",
+            "line": "internal/dmarc/dmarc.go:114"
+          },
+          {
+            "role": "condition",
+            "line": "internal/dmarc/dmarc.go:158"
+          },
+          {
+            "role": "condition",
+            "line": "internal/dmarc/dmarc.go:159"
+          },
+          {
+            "role": "input",
+            "line": "internal/dmarc/dmarc.go:160"
+          },
+          {
+            "role": "input",
+            "line": "internal/dmarc/dmarc.go:162"
+          }
+        ],
+        "gaps": [
+          "internal/collector/collector.go:155"
+        ]
+      },
+      "/domains/*/dmarc/policy": {
+        "operations": [
+          "dns.dmarc.lookup"
+        ],
+        "code": [
+          {
+            "role": "assign",
+            "line": "internal/collector/collector.go:288"
+          },
+          {
+            "role": "condition",
+            "line": "internal/collector/collector.go:302"
+          },
+          {
+            "role": "assign",
+            "line": "internal/collector/collector.go:304"
+          }
+        ],
+        "gaps": [
+          "internal/collector/collector.go:155"
+        ]
+      },
+      "/domains/*/dmarc/record": {
+        "operations": [
+          "dns.dmarc.lookup"
+        ],
+        "code": [
+          {
+            "role": "assign",
+            "line": "internal/collector/collector.go:287"
+          }
+        ],
+        "gaps": [
+          "internal/collector/collector.go:155"
+        ]
+      },
+      "/domains/*/dmarc/rua": {
+        "operations": [
+          "dns.dmarc.lookup"
+        ],
+        "code": [
+          {
+            "role": "assign",
+            "line": "internal/collector/collector.go:291"
+          },
+          {
+            "role": "helper",
+            "line": "internal/collector/collector.go:311",
+            "end": 319
+          }
+        ],
+        "gaps": [
+          "internal/collector/collector.go:155"
+        ]
+      },
+      "/domains/*/dmarc/subdomain_policy": {
+        "operations": [
+          "dns.dmarc.lookup"
+        ],
+        "code": [
+          {
+            "role": "assign",
+            "line": "internal/collector/collector.go:289"
           },
           {
             "role": "condition",
@@ -1027,303 +1275,12 @@
             "line": "internal/collector/collector.go:303"
           },
           {
-            "role": "input",
+            "role": "assign",
             "line": "internal/collector/collector.go:304"
-          },
-          {
-            "role": "condition",
-            "line": "internal/collector/collector.go:305"
-          },
-          {
-            "role": "condition",
-            "line": "internal/collector/collector.go:317"
-          },
-          {
-            "role": "condition",
-            "line": "internal/collector/collector.go:318"
-          },
-          {
-            "role": "assign",
-            "line": "internal/collector/collector.go:322"
-          },
-          {
-            "role": "helper",
-            "line": "internal/collector/collector.go:455",
-            "end": 472
           }
         ],
         "gaps": [
-          "internal/collector/collector.go:134",
-          "internal/collector/collector.go:136"
-        ]
-      },
-      "/domains/*/dmarc": {
-        "operations": [
-          "dns.dmarc.lookup"
-        ],
-        "code": [
-          {
-            "role": "input",
-            "line": "internal/collector/collector.go:214"
-          },
-          {
-            "role": "input",
-            "line": "internal/collector/collector.go:215"
-          },
-          {
-            "role": "condition",
-            "line": "internal/collector/collector.go:216"
-          },
-          {
-            "role": "input",
-            "line": "internal/collector/collector.go:222"
-          },
-          {
-            "role": "condition",
-            "line": "internal/collector/collector.go:223"
-          },
-          {
-            "role": "condition",
-            "line": "internal/collector/collector.go:224"
-          },
-          {
-            "role": "input",
-            "line": "internal/collector/collector.go:225"
-          },
-          {
-            "role": "condition",
-            "line": "internal/collector/collector.go:229"
-          },
-          {
-            "role": "condition",
-            "line": "internal/collector/collector.go:234"
-          },
-          {
-            "role": "input",
-            "line": "internal/collector/collector.go:235"
-          },
-          {
-            "role": "assign",
-            "line": "internal/collector/collector.go:237"
-          },
-          {
-            "role": "assign",
-            "line": "internal/collector/collector.go:242"
-          },
-          {
-            "role": "helper",
-            "line": "internal/collector/collector.go:246",
-            "end": 292
-          }
-        ],
-        "gaps": [
-          "internal/collector/collector.go:128"
-        ]
-      },
-      "/domains/*/dmarc/pct": {
-        "operations": [
-          "dns.dmarc.lookup"
-        ],
-        "code": [
-          {
-            "role": "assign",
-            "line": "internal/collector/collector.go:249"
-          },
-          {
-            "role": "input",
-            "line": "internal/collector/collector.go:253"
-          },
-          {
-            "role": "condition",
-            "line": "internal/collector/collector.go:254"
-          },
-          {
-            "role": "input",
-            "line": "internal/collector/collector.go:255"
-          },
-          {
-            "role": "condition",
-            "line": "internal/collector/collector.go:257"
-          },
-          {
-            "role": "condition",
-            "line": "internal/collector/collector.go:272"
-          },
-          {
-            "role": "condition",
-            "line": "internal/collector/collector.go:273"
-          },
-          {
-            "role": "assign",
-            "line": "internal/collector/collector.go:274"
-          }
-        ],
-        "gaps": [
-          "internal/collector/collector.go:128"
-        ]
-      },
-      "/domains/*/dmarc/policy": {
-        "operations": [
-          "dns.dmarc.lookup"
-        ],
-        "code": [
-          {
-            "role": "input",
-            "line": "internal/collector/collector.go:253"
-          },
-          {
-            "role": "condition",
-            "line": "internal/collector/collector.go:254"
-          },
-          {
-            "role": "input",
-            "line": "internal/collector/collector.go:255"
-          },
-          {
-            "role": "condition",
-            "line": "internal/collector/collector.go:257"
-          },
-          {
-            "role": "condition",
-            "line": "internal/collector/collector.go:258"
-          },
-          {
-            "role": "input",
-            "line": "internal/collector/collector.go:259"
-          },
-          {
-            "role": "condition",
-            "line": "internal/collector/collector.go:260"
-          },
-          {
-            "role": "assign",
-            "line": "internal/collector/collector.go:261"
-          },
-          {
-            "role": "assign",
-            "line": "internal/collector/collector.go:263"
-          }
-        ],
-        "gaps": [
-          "internal/collector/collector.go:128"
-        ]
-      },
-      "/domains/*/dmarc/record": {
-        "operations": [
-          "dns.dmarc.lookup"
-        ],
-        "code": [
-          {
-            "role": "assign",
-            "line": "internal/collector/collector.go:248"
-          }
-        ],
-        "gaps": [
-          "internal/collector/collector.go:128"
-        ]
-      },
-      "/domains/*/dmarc/rua": {
-        "operations": [
-          "dns.dmarc.lookup"
-        ],
-        "code": [
-          {
-            "role": "input",
-            "line": "internal/collector/collector.go:253"
-          },
-          {
-            "role": "condition",
-            "line": "internal/collector/collector.go:254"
-          },
-          {
-            "role": "input",
-            "line": "internal/collector/collector.go:255"
-          },
-          {
-            "role": "condition",
-            "line": "internal/collector/collector.go:257"
-          },
-          {
-            "role": "condition",
-            "line": "internal/collector/collector.go:277"
-          },
-          {
-            "role": "assign",
-            "line": "internal/collector/collector.go:279"
-          }
-        ],
-        "gaps": [
-          "internal/collector/collector.go:128"
-        ]
-      },
-      "/domains/*/dmarc/subdomain_policy": {
-        "operations": [
-          "dns.dmarc.lookup"
-        ],
-        "code": [
-          {
-            "role": "input",
-            "line": "internal/collector/collector.go:253"
-          },
-          {
-            "role": "condition",
-            "line": "internal/collector/collector.go:254"
-          },
-          {
-            "role": "input",
-            "line": "internal/collector/collector.go:255"
-          },
-          {
-            "role": "condition",
-            "line": "internal/collector/collector.go:257"
-          },
-          {
-            "role": "condition",
-            "line": "internal/collector/collector.go:258"
-          },
-          {
-            "role": "input",
-            "line": "internal/collector/collector.go:259"
-          },
-          {
-            "role": "condition",
-            "line": "internal/collector/collector.go:260"
-          },
-          {
-            "role": "input",
-            "line": "internal/collector/collector.go:261"
-          },
-          {
-            "role": "input",
-            "line": "internal/collector/collector.go:263"
-          },
-          {
-            "role": "condition",
-            "line": "internal/collector/collector.go:266"
-          },
-          {
-            "role": "input",
-            "line": "internal/collector/collector.go:267"
-          },
-          {
-            "role": "condition",
-            "line": "internal/collector/collector.go:268"
-          },
-          {
-            "role": "assign",
-            "line": "internal/collector/collector.go:269"
-          },
-          {
-            "role": "condition",
-            "line": "internal/collector/collector.go:287"
-          },
-          {
-            "role": "assign",
-            "line": "internal/collector/collector.go:288"
-          }
-        ],
-        "gaps": [
-          "internal/collector/collector.go:128"
+          "internal/collector/collector.go:155"
         ]
       },
       "/domains/*/dmarc/valid": {
@@ -1332,84 +1289,43 @@
         ],
         "code": [
           {
-            "role": "input",
-            "line": "internal/collector/collector.go:214"
-          },
-          {
-            "role": "input",
-            "line": "internal/collector/collector.go:215"
-          },
-          {
             "role": "condition",
-            "line": "internal/collector/collector.go:216"
-          },
-          {
-            "role": "input",
-            "line": "internal/collector/collector.go:222"
-          },
-          {
-            "role": "condition",
-            "line": "internal/collector/collector.go:223"
-          },
-          {
-            "role": "condition",
-            "line": "internal/collector/collector.go:224"
-          },
-          {
-            "role": "input",
-            "line": "internal/collector/collector.go:225"
-          },
-          {
-            "role": "condition",
-            "line": "internal/collector/collector.go:229"
-          },
-          {
-            "role": "condition",
-            "line": "internal/collector/collector.go:234"
+            "line": "internal/collector/collector.go:302"
           },
           {
             "role": "assign",
-            "line": "internal/collector/collector.go:236"
-          },
-          {
-            "role": "assign",
-            "line": "internal/collector/collector.go:250"
-          },
-          {
-            "role": "helper",
-            "line": "internal/collector/collector.go:420",
-            "end": 436
+            "line": "internal/collector/collector.go:304"
           }
         ],
         "gaps": [
-          "internal/collector/collector.go:128"
+          "internal/collector/collector.go:155"
         ]
       },
       "/domains/*/domain": {
         "code": [
           {
             "role": "condition",
-            "line": "internal/collector/collector.go:51"
+            "line": "internal/collector/collector.go:57"
           },
           {
             "role": "assign",
-            "line": "internal/collector/collector.go:52"
+            "line": "internal/collector/collector.go:65"
           },
           {
             "role": "input",
-            "line": "internal/collector/handler.go:31"
-          },
-          {
-            "role": "condition",
-            "line": "internal/collector/handler.go:32"
-          },
-          {
-            "role": "condition",
             "line": "internal/collector/handler.go:36"
           },
           {
-            "role": "input",
+            "role": "condition",
+            "line": "internal/collector/handler.go:37"
+          },
+          {
+            "role": "condition",
             "line": "internal/collector/handler.go:41"
+          },
+          {
+            "role": "input",
+            "line": "internal/collector/handler.go:51"
           }
         ]
       },
@@ -1423,70 +1339,50 @@
         "code": [
           {
             "role": "input",
-            "line": "internal/collector/collector.go:17"
+            "line": "internal/collector/collector.go:23"
           },
           {
             "role": "condition",
-            "line": "internal/collector/collector.go:51"
+            "line": "internal/collector/collector.go:57"
           },
           {
             "role": "assign",
-            "line": "internal/collector/collector.go:52"
+            "line": "internal/collector/collector.go:65"
           },
           {
             "role": "input",
-            "line": "internal/collector/collector.go:156"
+            "line": "internal/collector/collector.go:183"
           },
           {
             "role": "condition",
-            "line": "internal/collector/collector.go:157"
+            "line": "internal/collector/collector.go:184"
           },
           {
             "role": "assign",
-            "line": "internal/collector/collector.go:158"
-          },
-          {
-            "role": "input",
-            "line": "internal/collector/collector.go:178"
-          },
-          {
-            "role": "condition",
-            "line": "internal/collector/collector.go:179"
-          },
-          {
-            "role": "assign",
-            "line": "internal/collector/collector.go:180"
-          },
-          {
-            "role": "input",
             "line": "internal/collector/collector.go:185"
           },
           {
-            "role": "condition",
-            "line": "internal/collector/collector.go:186"
-          },
-          {
-            "role": "condition",
-            "line": "internal/collector/collector.go:187"
-          },
-          {
             "role": "input",
-            "line": "internal/collector/collector.go:188"
+            "line": "internal/collector/collector.go:205"
           },
           {
             "role": "condition",
-            "line": "internal/collector/collector.go:192"
-          },
-          {
-            "role": "condition",
-            "line": "internal/collector/collector.go:197"
+            "line": "internal/collector/collector.go:206"
           },
           {
             "role": "assign",
-            "line": "internal/collector/collector.go:202"
+            "line": "internal/collector/collector.go:207"
           },
           {
             "role": "input",
+            "line": "internal/collector/collector.go:212"
+          },
+          {
+            "role": "condition",
+            "line": "internal/collector/collector.go:213"
+          },
+          {
+            "role": "condition",
             "line": "internal/collector/collector.go:214"
           },
           {
@@ -1495,79 +1391,111 @@
           },
           {
             "role": "condition",
-            "line": "internal/collector/collector.go:216"
-          },
-          {
-            "role": "assign",
-            "line": "internal/collector/collector.go:217"
-          },
-          {
-            "role": "input",
-            "line": "internal/collector/collector.go:222"
-          },
-          {
-            "role": "condition",
-            "line": "internal/collector/collector.go:223"
+            "line": "internal/collector/collector.go:219"
           },
           {
             "role": "condition",
             "line": "internal/collector/collector.go:224"
           },
           {
-            "role": "input",
-            "line": "internal/collector/collector.go:225"
-          },
-          {
-            "role": "condition",
+            "role": "assign",
             "line": "internal/collector/collector.go:229"
           },
           {
+            "role": "input",
+            "line": "internal/collector/collector.go:244"
+          },
+          {
+            "role": "input",
+            "line": "internal/collector/collector.go:245"
+          },
+          {
+            "role": "input",
+            "line": "internal/collector/collector.go:246"
+          },
+          {
+            "role": "input",
+            "line": "internal/collector/collector.go:247"
+          },
+          {
+            "role": "input",
+            "line": "internal/collector/collector.go:250"
+          },
+          {
             "role": "condition",
-            "line": "internal/collector/collector.go:234"
+            "line": "internal/collector/collector.go:251"
           },
           {
             "role": "assign",
-            "line": "internal/collector/collector.go:238"
-          },
-          {
-            "role": "condition",
-            "line": "internal/collector/collector.go:302"
+            "line": "internal/collector/collector.go:252"
           },
           {
             "role": "input",
-            "line": "internal/collector/collector.go:303"
-          },
-          {
-            "role": "input",
-            "line": "internal/collector/collector.go:304"
+            "line": "internal/collector/collector.go:259"
           },
           {
             "role": "condition",
-            "line": "internal/collector/collector.go:305"
-          },
-          {
-            "role": "condition",
-            "line": "internal/collector/collector.go:307"
+            "line": "internal/collector/collector.go:260"
           },
           {
             "role": "assign",
-            "line": "internal/collector/collector.go:311"
+            "line": "internal/collector/collector.go:261"
+          },
+          {
+            "role": "condition",
+            "line": "internal/collector/collector.go:329"
           },
           {
             "role": "input",
-            "line": "internal/collector/handler.go:31"
+            "line": "internal/collector/collector.go:331"
           },
           {
             "role": "condition",
-            "line": "internal/collector/handler.go:32"
+            "line": "internal/collector/collector.go:332"
           },
           {
             "role": "condition",
+            "line": "internal/collector/collector.go:334"
+          },
+          {
+            "role": "assign",
+            "line": "internal/collector/collector.go:338"
+          },
+          {
+            "role": "input",
             "line": "internal/collector/handler.go:36"
           },
           {
-            "role": "input",
+            "role": "condition",
+            "line": "internal/collector/handler.go:37"
+          },
+          {
+            "role": "condition",
             "line": "internal/collector/handler.go:41"
+          },
+          {
+            "role": "input",
+            "line": "internal/collector/handler.go:51"
+          },
+          {
+            "role": "condition",
+            "line": "internal/dmarc/dmarc.go:287"
+          },
+          {
+            "role": "input",
+            "line": "internal/dmarc/dmarc.go:288"
+          },
+          {
+            "role": "condition",
+            "line": "internal/dmarc/dmarc.go:290"
+          },
+          {
+            "role": "input",
+            "line": "internal/dmarc/dmarc.go:291"
+          },
+          {
+            "role": "input",
+            "line": "internal/dmarc/dmarc.go:308"
           }
         ]
       },
@@ -1578,27 +1506,27 @@
         "code": [
           {
             "role": "input",
-            "line": "internal/collector/collector.go:156"
+            "line": "internal/collector/collector.go:183"
           },
           {
             "role": "condition",
-            "line": "internal/collector/collector.go:157"
+            "line": "internal/collector/collector.go:184"
           },
           {
             "role": "assign",
-            "line": "internal/collector/collector.go:162"
+            "line": "internal/collector/collector.go:189"
           },
           {
             "role": "condition",
-            "line": "internal/collector/collector.go:163"
+            "line": "internal/collector/collector.go:190"
           },
           {
             "role": "assign",
-            "line": "internal/collector/collector.go:164"
+            "line": "internal/collector/collector.go:191"
           }
         ],
         "gaps": [
-          "internal/collector/collector.go:122"
+          "internal/collector/collector.go:149"
         ]
       },
       "/domains/*/mx/*/host": {
@@ -1608,23 +1536,23 @@
         "code": [
           {
             "role": "input",
-            "line": "internal/collector/collector.go:156"
+            "line": "internal/collector/collector.go:183"
           },
           {
             "role": "condition",
-            "line": "internal/collector/collector.go:157"
+            "line": "internal/collector/collector.go:184"
           },
           {
             "role": "condition",
-            "line": "internal/collector/collector.go:163"
+            "line": "internal/collector/collector.go:190"
           },
           {
             "role": "assign",
-            "line": "internal/collector/collector.go:165"
+            "line": "internal/collector/collector.go:192"
           }
         ],
         "gaps": [
-          "internal/collector/collector.go:122"
+          "internal/collector/collector.go:149"
         ]
       },
       "/domains/*/mx/*/priority": {
@@ -1634,23 +1562,23 @@
         "code": [
           {
             "role": "input",
-            "line": "internal/collector/collector.go:156"
+            "line": "internal/collector/collector.go:183"
           },
           {
             "role": "condition",
-            "line": "internal/collector/collector.go:157"
+            "line": "internal/collector/collector.go:184"
           },
           {
             "role": "condition",
-            "line": "internal/collector/collector.go:163"
+            "line": "internal/collector/collector.go:190"
           },
           {
             "role": "assign",
-            "line": "internal/collector/collector.go:166"
+            "line": "internal/collector/collector.go:193"
           }
         ],
         "gaps": [
-          "internal/collector/collector.go:122"
+          "internal/collector/collector.go:149"
         ]
       },
       "/domains/*/spf": {
@@ -1660,52 +1588,52 @@
         "code": [
           {
             "role": "input",
-            "line": "internal/collector/collector.go:178"
+            "line": "internal/collector/collector.go:205"
           },
           {
             "role": "condition",
-            "line": "internal/collector/collector.go:179"
-          },
-          {
-            "role": "input",
-            "line": "internal/collector/collector.go:185"
-          },
-          {
-            "role": "condition",
-            "line": "internal/collector/collector.go:186"
-          },
-          {
-            "role": "condition",
-            "line": "internal/collector/collector.go:187"
-          },
-          {
-            "role": "input",
-            "line": "internal/collector/collector.go:188"
-          },
-          {
-            "role": "condition",
-            "line": "internal/collector/collector.go:192"
-          },
-          {
-            "role": "condition",
-            "line": "internal/collector/collector.go:197"
-          },
-          {
-            "role": "assign",
-            "line": "internal/collector/collector.go:198"
-          },
-          {
-            "role": "assign",
             "line": "internal/collector/collector.go:206"
           },
           {
+            "role": "input",
+            "line": "internal/collector/collector.go:212"
+          },
+          {
+            "role": "condition",
+            "line": "internal/collector/collector.go:213"
+          },
+          {
+            "role": "condition",
+            "line": "internal/collector/collector.go:214"
+          },
+          {
+            "role": "input",
+            "line": "internal/collector/collector.go:215"
+          },
+          {
+            "role": "condition",
+            "line": "internal/collector/collector.go:219"
+          },
+          {
+            "role": "condition",
+            "line": "internal/collector/collector.go:224"
+          },
+          {
+            "role": "assign",
+            "line": "internal/collector/collector.go:225"
+          },
+          {
+            "role": "assign",
+            "line": "internal/collector/collector.go:233"
+          },
+          {
             "role": "helper",
-            "line": "internal/collector/collector.go:335",
-            "end": 393
+            "line": "internal/collector/collector.go:366",
+            "end": 369
           }
         ],
         "gaps": [
-          "internal/collector/collector.go:125"
+          "internal/collector/collector.go:152"
         ]
       },
       "/domains/*/spf/record": {
@@ -1715,47 +1643,47 @@
         "code": [
           {
             "role": "input",
-            "line": "internal/collector/collector.go:178"
+            "line": "internal/collector/collector.go:205"
           },
           {
             "role": "condition",
-            "line": "internal/collector/collector.go:179"
+            "line": "internal/collector/collector.go:206"
           },
           {
             "role": "input",
-            "line": "internal/collector/collector.go:185"
+            "line": "internal/collector/collector.go:212"
           },
           {
             "role": "condition",
-            "line": "internal/collector/collector.go:186"
+            "line": "internal/collector/collector.go:213"
           },
           {
             "role": "condition",
-            "line": "internal/collector/collector.go:187"
+            "line": "internal/collector/collector.go:214"
           },
           {
             "role": "input",
-            "line": "internal/collector/collector.go:188"
+            "line": "internal/collector/collector.go:215"
           },
           {
             "role": "condition",
-            "line": "internal/collector/collector.go:192"
+            "line": "internal/collector/collector.go:219"
           },
           {
             "role": "condition",
-            "line": "internal/collector/collector.go:197"
+            "line": "internal/collector/collector.go:224"
           },
           {
             "role": "assign",
-            "line": "internal/collector/collector.go:199"
+            "line": "internal/collector/collector.go:226"
           },
           {
             "role": "assign",
-            "line": "internal/collector/collector.go:207"
+            "line": "internal/collector/collector.go:234"
           }
         ],
         "gaps": [
-          "internal/collector/collector.go:125"
+          "internal/collector/collector.go:152"
         ]
       },
       "/domains/*/spf/valid": {
@@ -1765,59 +1693,59 @@
         "code": [
           {
             "role": "input",
-            "line": "internal/collector/collector.go:178"
+            "line": "internal/collector/collector.go:205"
           },
           {
             "role": "condition",
-            "line": "internal/collector/collector.go:179"
+            "line": "internal/collector/collector.go:206"
           },
           {
             "role": "input",
-            "line": "internal/collector/collector.go:185"
+            "line": "internal/collector/collector.go:212"
           },
           {
             "role": "condition",
-            "line": "internal/collector/collector.go:186"
+            "line": "internal/collector/collector.go:213"
           },
           {
             "role": "condition",
-            "line": "internal/collector/collector.go:187"
+            "line": "internal/collector/collector.go:214"
           },
           {
             "role": "input",
-            "line": "internal/collector/collector.go:188"
+            "line": "internal/collector/collector.go:215"
           },
           {
             "role": "condition",
-            "line": "internal/collector/collector.go:192"
+            "line": "internal/collector/collector.go:219"
           },
           {
             "role": "condition",
-            "line": "internal/collector/collector.go:197"
+            "line": "internal/collector/collector.go:224"
           },
           {
             "role": "assign",
-            "line": "internal/collector/collector.go:200"
+            "line": "internal/collector/collector.go:227"
           },
           {
             "role": "assign",
-            "line": "internal/collector/collector.go:208"
+            "line": "internal/collector/collector.go:235"
           },
           {
             "role": "helper",
-            "line": "internal/collector/collector.go:335",
-            "end": 393
+            "line": "internal/collector/collector.go:366",
+            "end": 369
           }
         ],
         "gaps": [
-          "internal/collector/collector.go:125"
+          "internal/collector/collector.go:152"
         ]
       },
       "/schema_version": {
         "code": [
           {
             "role": "assign",
-            "line": "internal/collector/collector.go:69"
+            "line": "internal/collector/collector.go:82"
           }
         ]
       },
@@ -1828,43 +1756,43 @@
         "code": [
           {
             "role": "condition",
-            "line": "internal/collector/collector.go:560"
+            "line": "internal/collector/collector.go:486"
           },
           {
             "role": "condition",
-            "line": "internal/collector/collector.go:561"
+            "line": "internal/collector/collector.go:487"
           },
           {
             "role": "input",
-            "line": "internal/collector/collector.go:562"
+            "line": "internal/collector/collector.go:488"
           },
           {
             "role": "condition",
-            "line": "internal/collector/collector.go:563"
+            "line": "internal/collector/collector.go:489"
           },
           {
             "role": "input",
-            "line": "internal/collector/collector.go:564"
+            "line": "internal/collector/collector.go:490"
           },
           {
             "role": "input",
-            "line": "internal/collector/collector.go:572"
+            "line": "internal/collector/collector.go:498"
           },
           {
             "role": "condition",
-            "line": "internal/collector/collector.go:577"
+            "line": "internal/collector/collector.go:503"
           },
           {
             "role": "condition",
-            "line": "internal/collector/collector.go:601"
+            "line": "internal/collector/collector.go:527"
           },
           {
             "role": "assign",
-            "line": "internal/collector/collector.go:604"
+            "line": "internal/collector/collector.go:530"
           }
         ],
         "gaps": [
-          "internal/collector/collector.go:602"
+          "internal/collector/collector.go:528"
         ]
       },
       "/summary/enforced_count": {
@@ -1874,28 +1802,28 @@
         "code": [
           {
             "role": "input",
-            "line": "internal/collector/collector.go:572"
+            "line": "internal/collector/collector.go:498"
           },
           {
             "role": "condition",
-            "line": "internal/collector/collector.go:577"
+            "line": "internal/collector/collector.go:503"
           },
           {
             "role": "input",
-            "line": "internal/collector/collector.go:581"
+            "line": "internal/collector/collector.go:507"
           },
           {
             "role": "assign",
-            "line": "internal/collector/collector.go:599"
+            "line": "internal/collector/collector.go:525"
           },
           {
             "role": "helper",
-            "line": "internal/collector/collector.go:613",
-            "end": 621
+            "line": "internal/collector/collector.go:539",
+            "end": 547
           }
         ],
         "gaps": [
-          "internal/collector/collector.go:599"
+          "internal/collector/collector.go:525"
         ]
       },
       "/summary/enforced_pct": {
@@ -1905,39 +1833,39 @@
         "code": [
           {
             "role": "input",
-            "line": "internal/collector/collector.go:572"
+            "line": "internal/collector/collector.go:498"
           },
           {
             "role": "condition",
-            "line": "internal/collector/collector.go:577"
+            "line": "internal/collector/collector.go:503"
           },
           {
             "role": "input",
-            "line": "internal/collector/collector.go:581"
+            "line": "internal/collector/collector.go:507"
           },
           {
             "role": "assign",
-            "line": "internal/collector/collector.go:599"
+            "line": "internal/collector/collector.go:525"
           },
           {
             "role": "helper",
-            "line": "internal/collector/collector.go:613",
-            "end": 621
+            "line": "internal/collector/collector.go:539",
+            "end": 547
           }
         ],
         "gaps": [
-          "internal/collector/collector.go:599"
+          "internal/collector/collector.go:525"
         ]
       },
       "/summary/total_domains": {
         "code": [
           {
             "role": "input",
-            "line": "internal/collector/collector.go:572"
+            "line": "internal/collector/collector.go:498"
           },
           {
             "role": "assign",
-            "line": "internal/collector/collector.go:574"
+            "line": "internal/collector/collector.go:500"
           }
         ]
       },
@@ -1950,28 +1878,28 @@
         "code": [
           {
             "role": "input",
-            "line": "internal/collector/collector.go:572"
+            "line": "internal/collector/collector.go:498"
           },
           {
             "role": "condition",
-            "line": "internal/collector/collector.go:577"
+            "line": "internal/collector/collector.go:503"
           },
           {
             "role": "input",
-            "line": "internal/collector/collector.go:581"
+            "line": "internal/collector/collector.go:507"
           },
           {
             "role": "assign",
-            "line": "internal/collector/collector.go:598"
+            "line": "internal/collector/collector.go:524"
           },
           {
             "role": "helper",
-            "line": "internal/collector/collector.go:613",
-            "end": 621
+            "line": "internal/collector/collector.go:539",
+            "end": 547
           }
         ],
         "gaps": [
-          "internal/collector/collector.go:598"
+          "internal/collector/collector.go:524"
         ]
       },
       "/summary/with_all_three_pct": {
@@ -1983,28 +1911,28 @@
         "code": [
           {
             "role": "input",
-            "line": "internal/collector/collector.go:572"
+            "line": "internal/collector/collector.go:498"
           },
           {
             "role": "condition",
-            "line": "internal/collector/collector.go:577"
+            "line": "internal/collector/collector.go:503"
           },
           {
             "role": "input",
-            "line": "internal/collector/collector.go:581"
+            "line": "internal/collector/collector.go:507"
           },
           {
             "role": "assign",
-            "line": "internal/collector/collector.go:598"
+            "line": "internal/collector/collector.go:524"
           },
           {
             "role": "helper",
-            "line": "internal/collector/collector.go:613",
-            "end": 621
+            "line": "internal/collector/collector.go:539",
+            "end": 547
           }
         ],
         "gaps": [
-          "internal/collector/collector.go:598"
+          "internal/collector/collector.go:524"
         ]
       },
       "/summary/with_dkim_count": {
@@ -2014,28 +1942,28 @@
         "code": [
           {
             "role": "input",
-            "line": "internal/collector/collector.go:572"
+            "line": "internal/collector/collector.go:498"
           },
           {
             "role": "condition",
-            "line": "internal/collector/collector.go:577"
+            "line": "internal/collector/collector.go:503"
           },
           {
             "role": "input",
-            "line": "internal/collector/collector.go:581"
+            "line": "internal/collector/collector.go:507"
           },
           {
             "role": "assign",
-            "line": "internal/collector/collector.go:597"
+            "line": "internal/collector/collector.go:523"
           },
           {
             "role": "helper",
-            "line": "internal/collector/collector.go:613",
-            "end": 621
+            "line": "internal/collector/collector.go:539",
+            "end": 547
           }
         ],
         "gaps": [
-          "internal/collector/collector.go:597"
+          "internal/collector/collector.go:523"
         ]
       },
       "/summary/with_dkim_pct": {
@@ -2045,28 +1973,28 @@
         "code": [
           {
             "role": "input",
-            "line": "internal/collector/collector.go:572"
+            "line": "internal/collector/collector.go:498"
           },
           {
             "role": "condition",
-            "line": "internal/collector/collector.go:577"
+            "line": "internal/collector/collector.go:503"
           },
           {
             "role": "input",
-            "line": "internal/collector/collector.go:581"
+            "line": "internal/collector/collector.go:507"
           },
           {
             "role": "assign",
-            "line": "internal/collector/collector.go:597"
+            "line": "internal/collector/collector.go:523"
           },
           {
             "role": "helper",
-            "line": "internal/collector/collector.go:613",
-            "end": 621
+            "line": "internal/collector/collector.go:539",
+            "end": 547
           }
         ],
         "gaps": [
-          "internal/collector/collector.go:597"
+          "internal/collector/collector.go:523"
         ]
       },
       "/summary/with_dmarc_count": {
@@ -2076,28 +2004,28 @@
         "code": [
           {
             "role": "input",
-            "line": "internal/collector/collector.go:572"
+            "line": "internal/collector/collector.go:498"
           },
           {
             "role": "condition",
-            "line": "internal/collector/collector.go:577"
+            "line": "internal/collector/collector.go:503"
           },
           {
             "role": "input",
-            "line": "internal/collector/collector.go:581"
+            "line": "internal/collector/collector.go:507"
           },
           {
             "role": "assign",
-            "line": "internal/collector/collector.go:596"
+            "line": "internal/collector/collector.go:522"
           },
           {
             "role": "helper",
-            "line": "internal/collector/collector.go:613",
-            "end": 621
+            "line": "internal/collector/collector.go:539",
+            "end": 547
           }
         ],
         "gaps": [
-          "internal/collector/collector.go:596"
+          "internal/collector/collector.go:522"
         ]
       },
       "/summary/with_dmarc_pct": {
@@ -2107,28 +2035,28 @@
         "code": [
           {
             "role": "input",
-            "line": "internal/collector/collector.go:572"
+            "line": "internal/collector/collector.go:498"
           },
           {
             "role": "condition",
-            "line": "internal/collector/collector.go:577"
+            "line": "internal/collector/collector.go:503"
           },
           {
             "role": "input",
-            "line": "internal/collector/collector.go:581"
+            "line": "internal/collector/collector.go:507"
           },
           {
             "role": "assign",
-            "line": "internal/collector/collector.go:596"
+            "line": "internal/collector/collector.go:522"
           },
           {
             "role": "helper",
-            "line": "internal/collector/collector.go:613",
-            "end": 621
+            "line": "internal/collector/collector.go:539",
+            "end": 547
           }
         ],
         "gaps": [
-          "internal/collector/collector.go:596"
+          "internal/collector/collector.go:522"
         ]
       },
       "/summary/with_mx_count": {
@@ -2138,28 +2066,28 @@
         "code": [
           {
             "role": "input",
-            "line": "internal/collector/collector.go:572"
+            "line": "internal/collector/collector.go:498"
           },
           {
             "role": "condition",
-            "line": "internal/collector/collector.go:577"
+            "line": "internal/collector/collector.go:503"
           },
           {
             "role": "input",
-            "line": "internal/collector/collector.go:581"
+            "line": "internal/collector/collector.go:507"
           },
           {
             "role": "assign",
-            "line": "internal/collector/collector.go:594"
+            "line": "internal/collector/collector.go:520"
           },
           {
             "role": "helper",
-            "line": "internal/collector/collector.go:613",
-            "end": 621
+            "line": "internal/collector/collector.go:539",
+            "end": 547
           }
         ],
         "gaps": [
-          "internal/collector/collector.go:594"
+          "internal/collector/collector.go:520"
         ]
       },
       "/summary/with_mx_pct": {
@@ -2169,28 +2097,28 @@
         "code": [
           {
             "role": "input",
-            "line": "internal/collector/collector.go:572"
+            "line": "internal/collector/collector.go:498"
           },
           {
             "role": "condition",
-            "line": "internal/collector/collector.go:577"
+            "line": "internal/collector/collector.go:503"
           },
           {
             "role": "input",
-            "line": "internal/collector/collector.go:581"
+            "line": "internal/collector/collector.go:507"
           },
           {
             "role": "assign",
-            "line": "internal/collector/collector.go:594"
+            "line": "internal/collector/collector.go:520"
           },
           {
             "role": "helper",
-            "line": "internal/collector/collector.go:613",
-            "end": 621
+            "line": "internal/collector/collector.go:539",
+            "end": 547
           }
         ],
         "gaps": [
-          "internal/collector/collector.go:594"
+          "internal/collector/collector.go:520"
         ]
       },
       "/summary/with_reporting_count": {
@@ -2200,28 +2128,28 @@
         "code": [
           {
             "role": "input",
-            "line": "internal/collector/collector.go:572"
+            "line": "internal/collector/collector.go:498"
           },
           {
             "role": "condition",
-            "line": "internal/collector/collector.go:577"
+            "line": "internal/collector/collector.go:503"
           },
           {
             "role": "input",
-            "line": "internal/collector/collector.go:581"
+            "line": "internal/collector/collector.go:507"
           },
           {
             "role": "assign",
-            "line": "internal/collector/collector.go:600"
+            "line": "internal/collector/collector.go:526"
           },
           {
             "role": "helper",
-            "line": "internal/collector/collector.go:613",
-            "end": 621
+            "line": "internal/collector/collector.go:539",
+            "end": 547
           }
         ],
         "gaps": [
-          "internal/collector/collector.go:600"
+          "internal/collector/collector.go:526"
         ]
       },
       "/summary/with_reporting_pct": {
@@ -2231,28 +2159,28 @@
         "code": [
           {
             "role": "input",
-            "line": "internal/collector/collector.go:572"
+            "line": "internal/collector/collector.go:498"
           },
           {
             "role": "condition",
-            "line": "internal/collector/collector.go:577"
+            "line": "internal/collector/collector.go:503"
           },
           {
             "role": "input",
-            "line": "internal/collector/collector.go:581"
+            "line": "internal/collector/collector.go:507"
           },
           {
             "role": "assign",
-            "line": "internal/collector/collector.go:600"
+            "line": "internal/collector/collector.go:526"
           },
           {
             "role": "helper",
-            "line": "internal/collector/collector.go:613",
-            "end": 621
+            "line": "internal/collector/collector.go:539",
+            "end": 547
           }
         ],
         "gaps": [
-          "internal/collector/collector.go:600"
+          "internal/collector/collector.go:526"
         ]
       },
       "/summary/with_spf_count": {
@@ -2262,28 +2190,28 @@
         "code": [
           {
             "role": "input",
-            "line": "internal/collector/collector.go:572"
+            "line": "internal/collector/collector.go:498"
           },
           {
             "role": "condition",
-            "line": "internal/collector/collector.go:577"
+            "line": "internal/collector/collector.go:503"
           },
           {
             "role": "input",
-            "line": "internal/collector/collector.go:581"
+            "line": "internal/collector/collector.go:507"
           },
           {
             "role": "assign",
-            "line": "internal/collector/collector.go:595"
+            "line": "internal/collector/collector.go:521"
           },
           {
             "role": "helper",
-            "line": "internal/collector/collector.go:613",
-            "end": 621
+            "line": "internal/collector/collector.go:539",
+            "end": 547
           }
         ],
         "gaps": [
-          "internal/collector/collector.go:595"
+          "internal/collector/collector.go:521"
         ]
       },
       "/summary/with_spf_pct": {
@@ -2293,356 +2221,308 @@
         "code": [
           {
             "role": "input",
-            "line": "internal/collector/collector.go:572"
+            "line": "internal/collector/collector.go:498"
           },
           {
             "role": "condition",
-            "line": "internal/collector/collector.go:577"
+            "line": "internal/collector/collector.go:503"
           },
           {
             "role": "input",
-            "line": "internal/collector/collector.go:581"
+            "line": "internal/collector/collector.go:507"
           },
           {
             "role": "assign",
-            "line": "internal/collector/collector.go:595"
+            "line": "internal/collector/collector.go:521"
           },
           {
             "role": "helper",
-            "line": "internal/collector/collector.go:613",
-            "end": 621
+            "line": "internal/collector/collector.go:539",
+            "end": 547
           }
         ],
         "gaps": [
-          "internal/collector/collector.go:595"
+          "internal/collector/collector.go:521"
         ]
       }
     }
   },
   "lines": {
-    "internal/collector/collector.go:17": "var commonDKIMSelectors = []string{",
-    "internal/collector/collector.go:51": "\tfor i, domain := range cfg.Domains {",
-    "internal/collector/collector.go:52": "\t\tscans[i].result = DomainResult{Domain: domain, Errors: []string{}}",
-    "internal/collector/collector.go:65": "\t\td.dkimUnread, d.dkim = s.collectDKIM(ctx, d.result.Domain, \u0026d.result)",
-    "internal/collector/collector.go:69": "\t\tSchemaVersion: \"1.0.0\",",
-    "internal/collector/collector.go:70": "\t\tCollectedAt:   cfg.Now().UTC(),",
-    "internal/collector/collector.go:118": "\tr := \u0026d.result",
-    "internal/collector/collector.go:119": "\tr.Assessment = computeAssessment(r, d.dkim == nil)",
-    "internal/collector/collector.go:122": "\t\ts.rec.NotCollected(domainAt(index, \"mx\"), d.mx)",
-    "internal/collector/collector.go:125": "\t\ts.rec.NotCollected(domainAt(index, \"spf\"), d.spf)",
-    "internal/collector/collector.go:128": "\t\ts.rec.NotCollected(domainAt(index, \"dmarc\"), d.dmarc)",
-    "internal/collector/collector.go:129": "\t\ts.rec.NotCollected(domainAt(index, \"assessment/enforced\"), d.dmarc)",
-    "internal/collector/collector.go:130": "\t\ts.rec.NotCollected(domainAt(index, \"assessment/has_reporting\"), d.dmarc)",
-    "internal/collector/collector.go:134": "\t\ts.rec.Partial(domainAt(index, \"dkim\"), d.dkimUnread, d.dkim)",
-    "internal/collector/collector.go:136": "\t\ts.rec.NotCollected(domainAt(index, \"dkim\"), d.dkim)",
-    "internal/collector/collector.go:139": "\t\ts.rec.NotCollected(domainAt(index, \"assessment/issues\"), cmp.Or(d.spf, d.dmarc, d.dkim))",
-    "internal/collector/collector.go:156": "\tmxRecords, err := s.resolver.LookupMX(named(ctx, opMX), domain)",
-    "internal/collector/collector.go:157": "\tif err != nil \u0026\u0026 !isNotFound(err) {",
-    "internal/collector/collector.go:158": "\t\tresult.Errors = append(result.Errors, \"MX lookup failed: \"+err.Error())",
-    "internal/collector/collector.go:162": "\tresult.MX = make([]MXRecord, 0, len(mxRecords))",
-    "internal/collector/collector.go:163": "\tfor _, mx := range mxRecords {",
-    "internal/collector/collector.go:164": "\t\tresult.MX = append(result.MX, MXRecord{",
-    "internal/collector/collector.go:165": "\t\t\tHost:     strings.TrimSuffix(mx.Host, \".\"),",
-    "internal/collector/collector.go:166": "\t\t\tPriority: mx.Pref,",
-    "internal/collector/collector.go:178": "\ttxtRecords, err := s.resolver.LookupTXT(named(ctx, opSPF), domain)",
-    "internal/collector/collector.go:179": "\tif err != nil \u0026\u0026 !isNotFound(err) {",
-    "internal/collector/collector.go:180": "\t\tresult.Errors = append(result.Errors, \"SPF lookup failed: \"+err.Error())",
-    "internal/collector/collector.go:183": "\tresult.SPF.Read = true",
-    "internal/collector/collector.go:185": "\tvar spfRecords []string",
-    "internal/collector/collector.go:186": "\tfor _, txt := range txtRecords {",
-    "internal/collector/collector.go:187": "\t\tif isSPFRecord(txt) {",
-    "internal/collector/collector.go:188": "\t\t\tspfRecords = append(spfRecords, txt)",
-    "internal/collector/collector.go:192": "\tif len(spfRecords) == 0 {",
-    "internal/collector/collector.go:197": "\tif len(spfRecords) \u003e 1 {",
-    "internal/collector/collector.go:198": "\t\tresult.SPF.Record = \u0026SPFRecord{",
-    "internal/collector/collector.go:199": "\t\t\tRecord: spfRecords[0],",
-    "internal/collector/collector.go:200": "\t\t\tValid:  false,",
-    "internal/collector/collector.go:202": "\t\tresult.Errors = append(result.Errors, \"Multiple SPF records found (invalid per RFC 7208)\")",
-    "internal/collector/collector.go:206": "\tresult.SPF.Record = \u0026SPFRecord{",
-    "internal/collector/collector.go:207": "\t\tRecord: spfRecords[0],",
-    "internal/collector/collector.go:208": "\t\tValid:  validateSPF(spfRecords[0]),",
-    "internal/collector/collector.go:214": "\tdmarcDomain := \"_dmarc.\" + domain",
-    "internal/collector/collector.go:215": "\ttxtRecords, err := s.resolver.LookupTXT(named(ctx, opDMARC), dmarcDomain)",
-    "internal/collector/collector.go:216": "\tif err != nil \u0026\u0026 !isNotFound(err) {",
-    "internal/collector/collector.go:217": "\t\tresult.Errors = append(result.Errors, \"DMARC lookup failed: \"+err.Error())",
-    "internal/collector/collector.go:220": "\tresult.DMARC.Read = true",
-    "internal/collector/collector.go:222": "\tvar dmarcRecords []string",
-    "internal/collector/collector.go:223": "\tfor _, txt := range txtRecords {",
-    "internal/collector/collector.go:224": "\t\tif isDMARCRecord(txt) {",
-    "internal/collector/collector.go:225": "\t\t\tdmarcRecords = append(dmarcRecords, txt)",
-    "internal/collector/collector.go:229": "\tif len(dmarcRecords) == 0 {",
-    "internal/collector/collector.go:234": "\tif len(dmarcRecords) \u003e 1 {",
-    "internal/collector/collector.go:235": "\t\tdmarc := parseDMARC(dmarcRecords[0])",
-    "internal/collector/collector.go:236": "\t\tdmarc.Valid = false",
-    "internal/collector/collector.go:237": "\t\tresult.DMARC.Record = dmarc",
-    "internal/collector/collector.go:238": "\t\tresult.Errors = append(result.Errors, \"Multiple DMARC records found (invalid per RFC 7489)\")",
-    "internal/collector/collector.go:242": "\tresult.DMARC.Record = parseDMARC(dmarcRecords[0])",
-    "internal/collector/collector.go:246": "func parseDMARC(record string) *DMARCRecord {",
-    "internal/collector/collector.go:247": "\tdmarc := \u0026DMARCRecord{",
-    "internal/collector/collector.go:248": "\t\tRecord: record,",
-    "internal/collector/collector.go:249": "\t\tPct:    100, // Default per RFC",
-    "internal/collector/collector.go:250": "\t\tValid:  validateDMARC(record),",
-    "internal/collector/collector.go:251": "\t}",
-    "internal/collector/collector.go:252": "",
-    "internal/collector/collector.go:253": "\tparts := strings.Split(record, \";\")",
-    "internal/collector/collector.go:254": "\tfor _, part := range parts {",
-    "internal/collector/collector.go:255": "\t\tkey, value := parseDMARCTag(part)",
-    "internal/collector/collector.go:256": "",
-    "internal/collector/collector.go:257": "\t\tswitch key {",
-    "internal/collector/collector.go:258": "\t\tcase \"p\":",
-    "internal/collector/collector.go:259": "\t\t\tpolicy := strings.ToLower(value)",
-    "internal/collector/collector.go:260": "\t\t\tif policy == \"none\" || policy == \"quarantine\" || policy == \"reject\" {",
-    "internal/collector/collector.go:261": "\t\t\t\tdmarc.Policy = policy",
-    "internal/collector/collector.go:262": "\t\t\t} else {",
-    "internal/collector/collector.go:263": "\t\t\t\tdmarc.Policy = \"unknown\"",
-    "internal/collector/collector.go:264": "\t\t\t}",
-    "internal/collector/collector.go:265": "",
-    "internal/collector/collector.go:266": "\t\tcase \"sp\":",
-    "internal/collector/collector.go:267": "\t\t\tsp := strings.ToLower(value)",
-    "internal/collector/collector.go:268": "\t\t\tif sp == \"none\" || sp == \"quarantine\" || sp == \"reject\" {",
-    "internal/collector/collector.go:269": "\t\t\t\tdmarc.SubdomainPolicy = sp",
-    "internal/collector/collector.go:270": "\t\t\t}",
-    "internal/collector/collector.go:271": "",
-    "internal/collector/collector.go:272": "\t\tcase \"pct\":",
-    "internal/collector/collector.go:273": "\t\t\tif pct, err := strconv.Atoi(value); err == nil \u0026\u0026 pct \u003e= 0 \u0026\u0026 pct \u003c= 100 {",
-    "internal/collector/collector.go:274": "\t\t\t\tdmarc.Pct = pct",
-    "internal/collector/collector.go:275": "\t\t\t}",
-    "internal/collector/collector.go:276": "",
-    "internal/collector/collector.go:277": "\t\tcase \"rua\":",
-    "internal/collector/collector.go:278": "\t\t\t// Value already trimmed by parseDMARCTag, preserves original case",
-    "internal/collector/collector.go:279": "\t\t\tdmarc.RUA = value",
-    "internal/collector/collector.go:280": "",
-    "internal/collector/collector.go:281": "\t\tcase \"ruf\":",
-    "internal/collector/collector.go:282": "\t\t\tdmarc.RUF = value",
-    "internal/collector/collector.go:283": "\t\t}",
-    "internal/collector/collector.go:284": "\t}",
-    "internal/collector/collector.go:285": "",
-    "internal/collector/collector.go:286": "\t// If no subdomain policy, it inherits from main policy",
-    "internal/collector/collector.go:287": "\tif dmarc.SubdomainPolicy == \"\" {",
-    "internal/collector/collector.go:288": "\t\tdmarc.SubdomainPolicy = dmarc.Policy",
-    "internal/collector/collector.go:289": "\t}",
-    "internal/collector/collector.go:290": "",
-    "internal/collector/collector.go:291": "\treturn dmarc",
-    "internal/collector/collector.go:292": "}",
-    "internal/collector/collector.go:298": "\trecords := []DKIMRecord{}",
-    "internal/collector/collector.go:299": "\tfailed := 0",
-    "internal/collector/collector.go:302": "\tfor _, selector := range commonDKIMSelectors {",
-    "internal/collector/collector.go:303": "\t\tdkimDomain := selector + \"._domainkey.\" + domain",
-    "internal/collector/collector.go:304": "\t\ttxtRecords, err := s.resolver.LookupTXT(named(ctx, opDKIM), dkimDomain)",
-    "internal/collector/collector.go:305": "\t\tif err != nil {",
-    "internal/collector/collector.go:307": "\t\t\tif isNotFound(err) {",
-    "internal/collector/collector.go:311": "\t\t\tresult.Errors = append(result.Errors, \"DKIM lookup failed for selector \"+selector+\": \"+err.Error())",
-    "internal/collector/collector.go:312": "\t\t\tfailed++",
-    "internal/collector/collector.go:317": "\t\tfor _, txt := range txtRecords {",
-    "internal/collector/collector.go:318": "\t\t\tif isDKIMRecord(txt) {",
-    "internal/collector/collector.go:319": "\t\t\t\trecords = append(records, DKIMRecord{",
-    "internal/collector/collector.go:320": "\t\t\t\t\tSelector: selector,",
-    "internal/collector/collector.go:321": "\t\t\t\t\tRecord:   txt,",
-    "internal/collector/collector.go:322": "\t\t\t\t\tValid:    validateDKIM(txt),",
-    "internal/collector/collector.go:329": "\tif failed \u003c len(commonDKIMSelectors) {",
-    "internal/collector/collector.go:330": "\t\tresult.DKIM = records",
-    "internal/collector/collector.go:335": "func validateSPF(record string) bool {",
-    "internal/collector/collector.go:336": "\t// Must be a valid SPF record (exact version match)",
-    "internal/collector/collector.go:337": "\tif !isSPFRecord(record) {",
-    "internal/collector/collector.go:338": "\t\treturn false",
-    "internal/collector/collector.go:339": "\t}",
-    "internal/collector/collector.go:340": "\tlower := strings.ToLower(record)",
-    "internal/collector/collector.go:341": "",
-    "internal/collector/collector.go:342": "\t// SPF mechanisms are space-separated tokens after v=spf1",
-    "internal/collector/collector.go:343": "\t// Valid mechanisms: all, include:, a, a:, a/, mx, mx:, mx/, ip4:, ip6:, exists:, redirect=, ptr, ptr:",
-    "internal/collector/collector.go:344": "\t// Unknown modifiers (name=value where name starts with alpha) are allowed per RFC 7208 §12",
-    "internal/collector/collector.go:345": "\tparts := strings.Fields(lower)",
-    "internal/collector/collector.go:346": "\tif len(parts) \u003c 2 {",
-    "internal/collector/collector.go:347": "\t\treturn false // Just \"v=spf1\" with no mechanisms",
-    "internal/collector/collector.go:348": "\t}",
-    "internal/collector/collector.go:349": "",
-    "internal/collector/collector.go:350": "\thasValidMechanism := false",
-    "internal/collector/collector.go:351": "\tfor _, part := range parts[1:] { // Skip v=spf1",
-    "internal/collector/collector.go:352": "\t\t// Remove qualifier prefix if present (+, -, ~, ?)",
-    "internal/collector/collector.go:353": "\t\tmechanism := strings.TrimLeft(part, \"+-~?\")",
-    "internal/collector/collector.go:354": "",
-    "internal/collector/collector.go:355": "\t\t// Check for known mechanisms",
-    "internal/collector/collector.go:356": "\t\tisKnownMechanism := mechanism == \"all\" ||",
-    "internal/collector/collector.go:357": "\t\t\tmechanism == \"a\" ||",
-    "internal/collector/collector.go:358": "\t\t\tmechanism == \"mx\" ||",
-    "internal/collector/collector.go:359": "\t\t\tmechanism == \"ptr\" ||",
-    "internal/collector/collector.go:360": "\t\t\tstrings.HasPrefix(mechanism, \"include:\") ||",
-    "internal/collector/collector.go:361": "\t\t\tstrings.HasPrefix(mechanism, \"a:\") ||",
-    "internal/collector/collector.go:362": "\t\t\tstrings.HasPrefix(mechanism, \"a/\") ||",
-    "internal/collector/collector.go:363": "\t\t\tstrings.HasPrefix(mechanism, \"mx:\") ||",
-    "internal/collector/collector.go:364": "\t\t\tstrings.HasPrefix(mechanism, \"mx/\") ||",
-    "internal/collector/collector.go:365": "\t\t\tstrings.HasPrefix(mechanism, \"ip4:\") ||",
-    "internal/collector/collector.go:366": "\t\t\tstrings.HasPrefix(mechanism, \"ip6:\") ||",
-    "internal/collector/collector.go:367": "\t\t\tstrings.HasPrefix(mechanism, \"exists:\") ||",
-    "internal/collector/collector.go:368": "\t\t\tstrings.HasPrefix(mechanism, \"redirect=\") ||",
-    "internal/collector/collector.go:369": "\t\t\tstrings.HasPrefix(mechanism, \"ptr:\") ||",
-    "internal/collector/collector.go:370": "\t\t\tstrings.HasPrefix(mechanism, \"exp=\")",
-    "internal/collector/collector.go:371": "",
-    "internal/collector/collector.go:372": "\t\t// Check for unknown modifier: name=value where name starts with alpha",
-    "internal/collector/collector.go:373": "\t\t// Per RFC 7208 §12: unknown-modifier = name \"=\" macro-string",
-    "internal/collector/collector.go:374": "\t\t// name = ALPHA *( ALPHA / DIGIT / \"-\" / \"_\" / \".\" )",
-    "internal/collector/collector.go:375": "\t\tisUnknownModifier := false",
-    "internal/collector/collector.go:376": "\t\tif strings.Contains(mechanism, \"=\") {",
-    "internal/collector/collector.go:377": "\t\t\teqIdx := strings.Index(mechanism, \"=\")",
-    "internal/collector/collector.go:378": "\t\t\tname := mechanism[:eqIdx]",
-    "internal/collector/collector.go:379": "\t\t\tif len(name) \u003e 0 \u0026\u0026 isAlpha(name[0]) \u0026\u0026 isValidSPFName(name) {",
-    "internal/collector/collector.go:380": "\t\t\t\tisUnknownModifier = true",
-    "internal/collector/collector.go:381": "\t\t\t}",
-    "internal/collector/collector.go:382": "\t\t}",
-    "internal/collector/collector.go:383": "",
-    "internal/collector/collector.go:384": "\t\tif isKnownMechanism {",
-    "internal/collector/collector.go:385": "\t\t\thasValidMechanism = true",
-    "internal/collector/collector.go:386": "\t\t} else if !isUnknownModifier {",
-    "internal/collector/collector.go:387": "\t\t\t// Invalid term (not a known mechanism and not an unknown modifier)",
-    "internal/collector/collector.go:388": "\t\t\treturn false",
-    "internal/collector/collector.go:389": "\t\t}",
-    "internal/collector/collector.go:390": "\t\t// Unknown modifiers are valid but don't count as mechanisms",
-    "internal/collector/collector.go:391": "\t}",
-    "internal/collector/collector.go:392": "\treturn hasValidMechanism",
-    "internal/collector/collector.go:393": "}",
-    "internal/collector/collector.go:420": "func validateDMARC(record string) bool {",
-    "internal/collector/collector.go:421": "\t// Must be a valid DMARC record (exact version match)",
-    "internal/collector/collector.go:422": "\tif !isDMARCRecord(record) {",
-    "internal/collector/collector.go:423": "\t\treturn false",
-    "internal/collector/collector.go:424": "\t}",
-    "internal/collector/collector.go:425": "\t// Parse all tags and validate p= value (sp= is optional and invalid values are ignored per receiver behavior)",
-    "internal/collector/collector.go:426": "\tparts := strings.Split(record, \";\")",
-    "internal/collector/collector.go:427": "\tfor _, part := range parts {",
-    "internal/collector/collector.go:428": "\t\tkey, value := parseDMARCTag(part)",
-    "internal/collector/collector.go:429": "\t\tif key == \"p\" {",
-    "internal/collector/collector.go:430": "\t\t\tpolicy := strings.ToLower(value)",
-    "internal/collector/collector.go:431": "\t\t\t// Only valid policy values per RFC 7489",
-    "internal/collector/collector.go:432": "\t\t\treturn policy == \"none\" || policy == \"quarantine\" || policy == \"reject\"",
-    "internal/collector/collector.go:433": "\t\t}",
-    "internal/collector/collector.go:434": "\t}",
-    "internal/collector/collector.go:435": "\treturn false",
-    "internal/collector/collector.go:436": "}",
-    "internal/collector/collector.go:455": "func validateDKIM(record string) bool {",
-    "internal/collector/collector.go:456": "\t// Must be a valid DKIM record and contain a non-empty public key",
-    "internal/collector/collector.go:457": "\tif !isDKIMRecord(record) {",
-    "internal/collector/collector.go:458": "\t\treturn false",
-    "internal/collector/collector.go:459": "\t}",
-    "internal/collector/collector.go:460": "\t// Check for non-empty p= value",
-    "internal/collector/collector.go:461": "\tlower := strings.ToLower(record)",
-    "internal/collector/collector.go:462": "\tparts := strings.Split(lower, \";\")",
-    "internal/collector/collector.go:463": "\tfor _, part := range parts {",
-    "internal/collector/collector.go:464": "\t\tpart = strings.TrimSpace(part)",
-    "internal/collector/collector.go:465": "\t\tif strings.HasPrefix(part, \"p=\") {",
-    "internal/collector/collector.go:466": "\t\t\tkey := strings.TrimPrefix(part, \"p=\")",
-    "internal/collector/collector.go:467": "\t\t\tkey = strings.TrimSpace(key)",
-    "internal/collector/collector.go:468": "\t\t\treturn key != \"\" // Non-empty key",
-    "internal/collector/collector.go:469": "\t\t}",
-    "internal/collector/collector.go:470": "\t}",
-    "internal/collector/collector.go:471": "\treturn false",
-    "internal/collector/collector.go:472": "}",
-    "internal/collector/collector.go:477": "func computeAssessment(result *DomainResult, dkimComplete bool) Assessment {",
-    "internal/collector/collector.go:478": "\tspf, dmarc := result.SPF.Record, result.DMARC.Record",
-    "internal/collector/collector.go:479": "\tenforced, hasReporting := false, false",
-    "internal/collector/collector.go:480": "\tissues := []string{}",
-    "internal/collector/collector.go:481": "",
-    "internal/collector/collector.go:482": "\t// Check SPF",
-    "internal/collector/collector.go:483": "\tif spf == nil {",
-    "internal/collector/collector.go:484": "\t\tissues = append(issues, \"No SPF record\")",
-    "internal/collector/collector.go:485": "\t} else if !spf.Valid {",
-    "internal/collector/collector.go:486": "\t\tissues = append(issues, \"Invalid SPF record\")",
-    "internal/collector/collector.go:487": "\t}",
-    "internal/collector/collector.go:488": "",
-    "internal/collector/collector.go:489": "\t// Check DMARC",
-    "internal/collector/collector.go:490": "\tif dmarc == nil {",
-    "internal/collector/collector.go:491": "\t\tissues = append(issues, \"No DMARC record\")",
-    "internal/collector/collector.go:492": "\t} else if !dmarc.Valid {",
-    "internal/collector/collector.go:493": "\t\tissues = append(issues, \"Invalid DMARC record\")",
-    "internal/collector/collector.go:494": "\t} else {",
-    "internal/collector/collector.go:495": "\t\tif dmarc.Policy == \"reject\" \u0026\u0026 dmarc.Pct == 100 {",
-    "internal/collector/collector.go:496": "\t\t\tenforced = true",
-    "internal/collector/collector.go:497": "\t\t} else if dmarc.Policy == \"none\" {",
-    "internal/collector/collector.go:498": "\t\t\tissues = append(issues, \"DMARC policy is 'none' (monitoring only)\")",
-    "internal/collector/collector.go:499": "\t\t} else if dmarc.Policy == \"quarantine\" {",
-    "internal/collector/collector.go:500": "\t\t\tissues = append(issues, \"DMARC policy is 'quarantine' (not reject)\")",
-    "internal/collector/collector.go:501": "\t\t} else if dmarc.Pct \u003c 100 {",
-    "internal/collector/collector.go:502": "\t\t\tissues = append(issues, \"DMARC pct is less than 100%\")",
-    "internal/collector/collector.go:503": "\t\t}",
-    "internal/collector/collector.go:504": "",
-    "internal/collector/collector.go:505": "\t\tif dmarc.RUA != \"\" {",
-    "internal/collector/collector.go:506": "\t\t\thasReporting = true",
-    "internal/collector/collector.go:507": "\t\t} else {",
-    "internal/collector/collector.go:508": "\t\t\tissues = append(issues, \"No DMARC aggregate reporting (rua) configured\")",
-    "internal/collector/collector.go:509": "\t\t}",
-    "internal/collector/collector.go:510": "",
-    "internal/collector/collector.go:511": "\t\tif dmarc.SubdomainPolicy != \"reject\" {",
-    "internal/collector/collector.go:512": "\t\t\tissues = append(issues, \"Subdomain policy is not 'reject'\")",
-    "internal/collector/collector.go:513": "\t\t}",
-    "internal/collector/collector.go:514": "",
-    "internal/collector/collector.go:515": "\t\t// Check for invalid sp= value (record is still valid, but sp= is malformed)",
-    "internal/collector/collector.go:516": "\t\tif hasInvalidSP(dmarc.Record) {",
-    "internal/collector/collector.go:517": "\t\t\tissues = append(issues, \"DMARC sp= tag has invalid value (ignored, using p= for subdomains)\")",
-    "internal/collector/collector.go:518": "\t\t}",
-    "internal/collector/collector.go:519": "\t}",
-    "internal/collector/collector.go:520": "",
-    "internal/collector/collector.go:521": "\t// Check DKIM (note: only common selectors are checked, custom selectors may exist)",
-    "internal/collector/collector.go:522": "\thasValidDKIM := false",
-    "internal/collector/collector.go:523": "\tif len(result.DKIM) == 0 {",
-    "internal/collector/collector.go:524": "\t\tissues = append(issues, \"No DKIM records found for common selectors (custom selectors not checked)\")",
-    "internal/collector/collector.go:525": "\t} else {",
-    "internal/collector/collector.go:526": "\t\tfor _, dkim := range result.DKIM {",
-    "internal/collector/collector.go:527": "\t\t\tif dkim.Valid {",
-    "internal/collector/collector.go:528": "\t\t\t\thasValidDKIM = true",
-    "internal/collector/collector.go:529": "\t\t\t\tbreak",
-    "internal/collector/collector.go:530": "\t\t\t}",
-    "internal/collector/collector.go:531": "\t\t}",
-    "internal/collector/collector.go:532": "\t\tif !hasValidDKIM {",
-    "internal/collector/collector.go:533": "\t\t\tissues = append(issues, \"No valid DKIM records (all keys are malformed or revoked)\")",
-    "internal/collector/collector.go:534": "\t\t}",
-    "internal/collector/collector.go:535": "\t}",
-    "internal/collector/collector.go:536": "",
-    "internal/collector/collector.go:537": "\tvar assessment Assessment",
-    "internal/collector/collector.go:538": "\tif result.DMARC.Read {",
-    "internal/collector/collector.go:539": "\t\tassessment.Enforced, assessment.HasReporting = new(enforced), new(hasReporting)",
-    "internal/collector/collector.go:540": "\t}",
-    "internal/collector/collector.go:541": "\t// A selector whose lookup failed could only add keys, so a valid key",
-    "internal/collector/collector.go:542": "\t// already read settles the DKIM check.",
-    "internal/collector/collector.go:543": "\tif result.SPF.Read \u0026\u0026 result.DMARC.Read \u0026\u0026 (dkimComplete || hasValidDKIM) {",
-    "internal/collector/collector.go:544": "\t\tassessment.Issues = issues",
+    "internal/collector/collector.go:23": "var commonDKIMSelectors = []string{",
+    "internal/collector/collector.go:57": "\tfor i, domain := range cfg.Domains {",
+    "internal/collector/collector.go:58": "\t\tname, err := lookupName(domain)",
+    "internal/collector/collector.go:59": "\t\tif err != nil {",
+    "internal/collector/collector.go:62": "\t\t\tname = domain",
+    "internal/collector/collector.go:64": "\t\tscans[i].name = name",
+    "internal/collector/collector.go:65": "\t\tscans[i].result = DomainResult{Domain: domain, Errors: []string{}}",
+    "internal/collector/collector.go:78": "\t\td.dkimUnread, d.dkim = s.collectDKIM(ctx, d.name, \u0026d.result)",
+    "internal/collector/collector.go:82": "\t\tSchemaVersion: \"1.0.0\",",
+    "internal/collector/collector.go:83": "\t\tCollectedAt:   cfg.Now().UTC(),",
+    "internal/collector/collector.go:145": "\tr := \u0026d.result",
+    "internal/collector/collector.go:146": "\tr.Assessment = computeAssessment(r, d.dkim == nil)",
+    "internal/collector/collector.go:149": "\t\ts.rec.NotCollected(domainAt(index, \"mx\"), d.mx)",
+    "internal/collector/collector.go:152": "\t\ts.rec.NotCollected(domainAt(index, \"spf\"), d.spf)",
+    "internal/collector/collector.go:155": "\t\ts.rec.NotCollected(domainAt(index, \"dmarc\"), d.dmarc)",
+    "internal/collector/collector.go:156": "\t\ts.rec.NotCollected(domainAt(index, \"assessment/enforced\"), d.dmarc)",
+    "internal/collector/collector.go:157": "\t\ts.rec.NotCollected(domainAt(index, \"assessment/has_reporting\"), d.dmarc)",
+    "internal/collector/collector.go:161": "\t\ts.rec.Partial(domainAt(index, \"dkim\"), d.dkimUnread, d.dkim)",
+    "internal/collector/collector.go:163": "\t\ts.rec.NotCollected(domainAt(index, \"dkim\"), d.dkim)",
+    "internal/collector/collector.go:166": "\t\ts.rec.NotCollected(domainAt(index, \"assessment/issues\"), cmp.Or(d.spf, d.dmarc, d.dkim))",
+    "internal/collector/collector.go:183": "\tmxRecords, err := s.resolver.LookupMX(named(ctx, opMX), domain)",
+    "internal/collector/collector.go:184": "\tif err != nil \u0026\u0026 !isNotFound(err) {",
+    "internal/collector/collector.go:185": "\t\tresult.Errors = append(result.Errors, \"MX lookup failed: \"+err.Error())",
+    "internal/collector/collector.go:189": "\tresult.MX = make([]MXRecord, 0, len(mxRecords))",
+    "internal/collector/collector.go:190": "\tfor _, mx := range mxRecords {",
+    "internal/collector/collector.go:191": "\t\tresult.MX = append(result.MX, MXRecord{",
+    "internal/collector/collector.go:192": "\t\t\tHost:     strings.TrimSuffix(mx.Host, \".\"),",
+    "internal/collector/collector.go:193": "\t\t\tPriority: mx.Pref,",
+    "internal/collector/collector.go:205": "\ttxtRecords, err := s.resolver.LookupTXT(named(ctx, opSPF), domain)",
+    "internal/collector/collector.go:206": "\tif err != nil \u0026\u0026 !isNotFound(err) {",
+    "internal/collector/collector.go:207": "\t\tresult.Errors = append(result.Errors, \"SPF lookup failed: \"+err.Error())",
+    "internal/collector/collector.go:210": "\tresult.SPF.Read = true",
+    "internal/collector/collector.go:212": "\tvar spfRecords []string",
+    "internal/collector/collector.go:213": "\tfor _, txt := range txtRecords {",
+    "internal/collector/collector.go:214": "\t\tif spf.IsRecord(txt) {",
+    "internal/collector/collector.go:215": "\t\t\tspfRecords = append(spfRecords, txt)",
+    "internal/collector/collector.go:219": "\tif len(spfRecords) == 0 {",
+    "internal/collector/collector.go:224": "\tif len(spfRecords) \u003e 1 {",
+    "internal/collector/collector.go:225": "\t\tresult.SPF.Record = \u0026SPFRecord{",
+    "internal/collector/collector.go:226": "\t\t\tRecord: spfRecords[0],",
+    "internal/collector/collector.go:227": "\t\t\tValid:  false,",
+    "internal/collector/collector.go:229": "\t\tresult.Errors = append(result.Errors, \"Multiple SPF records found (invalid per RFC 7208)\")",
+    "internal/collector/collector.go:233": "\tresult.SPF.Record = \u0026SPFRecord{",
+    "internal/collector/collector.go:234": "\t\tRecord: spfRecords[0],",
+    "internal/collector/collector.go:235": "\t\tValid:  validateSPF(spfRecords[0]),",
+    "internal/collector/collector.go:244": "\tanswers := map[string][]string{}",
+    "internal/collector/collector.go:245": "\tlookup := func(ctx context.Context, name string) ([]string, error) {",
+    "internal/collector/collector.go:246": "\t\ttxts, err := s.resolver.LookupTXT(ctx, name)",
+    "internal/collector/collector.go:247": "\t\tanswers[name] = txts",
+    "internal/collector/collector.go:250": "\tfound, ok, err := dmarc.Discover(named(ctx, opDMARC), domain, lookup)",
+    "internal/collector/collector.go:251": "\tif err != nil {",
+    "internal/collector/collector.go:252": "\t\tresult.Errors = append(result.Errors, \"DMARC lookup failed: \"+err.Error())",
+    "internal/collector/collector.go:255": "\tresult.DMARC.Read = true",
+    "internal/collector/collector.go:259": "\town := found.Queried[0]",
+    "internal/collector/collector.go:260": "\tif len(dmarcRecords(answers[own])) \u003e 1 {",
+    "internal/collector/collector.go:261": "\t\tresult.Errors = append(result.Errors, \"Multiple DMARC records found (receivers ignore them)\")",
+    "internal/collector/collector.go:263": "\tif !ok {",
+    "internal/collector/collector.go:266": "\tat := \"_dmarc.\" + found.At",
+    "internal/collector/collector.go:267": "\ttext := dmarcRecords(answers[at])[0]",
+    "internal/collector/collector.go:268": "\tresult.DMARC.Record = newDMARCRecord(text, found.Record, at != own)",
+    "internal/collector/collector.go:285": "func newDMARCRecord(text string, r dmarc.Record, above bool) *DMARCRecord {",
+    "internal/collector/collector.go:286": "\td := \u0026DMARCRecord{",
+    "internal/collector/collector.go:287": "\t\tRecord:          text,",
+    "internal/collector/collector.go:288": "\t\tPolicy:          \"unknown\",",
+    "internal/collector/collector.go:289": "\t\tSubdomainPolicy: \"unknown\",",
+    "internal/collector/collector.go:290": "\t\tPct:             100,",
+    "internal/collector/collector.go:291": "\t\tRUA:             tagValue(text, \"rua\"),",
+    "internal/collector/collector.go:292": "\t\tRUF:             tagValue(text, \"ruf\"),",
+    "internal/collector/collector.go:293": "\t\tparsed:          r,",
+    "internal/collector/collector.go:294": "\t\tabove:           above,",
+    "internal/collector/collector.go:295": "\t}",
+    "internal/collector/collector.go:296": "\tif pct, err := strconv.Atoi(r.Legacy[\"pct\"]); err == nil \u0026\u0026 pct \u003e= 0 \u0026\u0026 pct \u003c= 100 {",
+    "internal/collector/collector.go:297": "\t\td.Pct = pct",
+    "internal/collector/collector.go:298": "\t}",
+    "internal/collector/collector.go:299": "\t// Receivers treat a record with no valid p tag, or an invalid sp or np",
+    "internal/collector/collector.go:300": "\t// tag, as p=none when it lists a valid rua URI. Without one, no DMARC",
+    "internal/collector/collector.go:301": "\t// policy applies, and the record is not valid.",
+    "internal/collector/collector.go:302": "\tif p, ok := r.Requested(false, true); ok {",
+    "internal/collector/collector.go:303": "\t\tsp, _ := r.Requested(true, true)",
+    "internal/collector/collector.go:304": "\t\td.Policy, d.SubdomainPolicy, d.Valid = string(p), string(sp), true",
+    "internal/collector/collector.go:305": "\t}",
+    "internal/collector/collector.go:306": "\treturn d",
+    "internal/collector/collector.go:307": "}",
+    "internal/collector/collector.go:311": "func tagValue(record, name string) string {",
+    "internal/collector/collector.go:312": "\tfor _, part := range strings.Split(record, \";\") {",
+    "internal/collector/collector.go:313": "\t\tkey, value, ok := strings.Cut(part, \"=\")",
+    "internal/collector/collector.go:314": "\t\tif ok \u0026\u0026 strings.EqualFold(strings.TrimSpace(key), name) {",
+    "internal/collector/collector.go:315": "\t\t\treturn strings.TrimSpace(value)",
+    "internal/collector/collector.go:316": "\t\t}",
+    "internal/collector/collector.go:317": "\t}",
+    "internal/collector/collector.go:318": "\treturn \"\"",
+    "internal/collector/collector.go:319": "}",
+    "internal/collector/collector.go:325": "\trecords := []DKIMRecord{}",
+    "internal/collector/collector.go:326": "\tfailed := 0",
+    "internal/collector/collector.go:329": "\tfor _, selector := range commonDKIMSelectors {",
+    "internal/collector/collector.go:330": "\t\tdkimDomain := selector + \"._domainkey.\" + domain",
+    "internal/collector/collector.go:331": "\t\ttxtRecords, err := s.resolver.LookupTXT(named(ctx, opDKIM), dkimDomain)",
+    "internal/collector/collector.go:332": "\t\tif err != nil {",
+    "internal/collector/collector.go:334": "\t\t\tif isNotFound(err) {",
+    "internal/collector/collector.go:338": "\t\t\tresult.Errors = append(result.Errors, \"DKIM lookup failed for selector \"+selector+\": \"+err.Error())",
+    "internal/collector/collector.go:339": "\t\t\tfailed++",
+    "internal/collector/collector.go:344": "\t\tfor _, txt := range txtRecords {",
+    "internal/collector/collector.go:345": "\t\t\tif isDKIMRecord(txt) {",
+    "internal/collector/collector.go:346": "\t\t\t\trecords = append(records, DKIMRecord{",
+    "internal/collector/collector.go:347": "\t\t\t\t\tSelector: selector,",
+    "internal/collector/collector.go:348": "\t\t\t\t\tRecord:   txt,",
+    "internal/collector/collector.go:349": "\t\t\t\t\tValid:    validateDKIM(txt),",
+    "internal/collector/collector.go:356": "\tif failed \u003c len(commonDKIMSelectors) {",
+    "internal/collector/collector.go:357": "\t\tresult.DKIM = records",
+    "internal/collector/collector.go:366": "func validateSPF(record string) bool {",
+    "internal/collector/collector.go:367": "\tr, err := spf.Parse(record)",
+    "internal/collector/collector.go:368": "\treturn err == nil \u0026\u0026 (len(r.Mechanisms) \u003e 0 || r.Redirect != \"\" || r.Exp != \"\")",
+    "internal/collector/collector.go:369": "}",
+    "internal/collector/collector.go:376": "func validateDKIM(record string) bool {",
+    "internal/collector/collector.go:377": "\tkey, ok := dkimPublicKey(record)",
+    "internal/collector/collector.go:378": "\tif !ok || repeatsTag(record) {",
+    "internal/collector/collector.go:379": "\t\treturn false",
+    "internal/collector/collector.go:380": "\t}",
+    "internal/collector/collector.go:381": "\tkey = strings.Join(strings.Fields(key), \"\")",
+    "internal/collector/collector.go:382": "\tkey = strings.TrimSuffix(strings.TrimSuffix(key, \"=\"), \"=\")",
+    "internal/collector/collector.go:383": "\tif key == \"\" {",
+    "internal/collector/collector.go:384": "\t\treturn false",
+    "internal/collector/collector.go:385": "\t}",
+    "internal/collector/collector.go:386": "\t_, err := base64.RawStdEncoding.DecodeString(key)",
+    "internal/collector/collector.go:387": "\treturn err == nil",
+    "internal/collector/collector.go:388": "}",
+    "internal/collector/collector.go:393": "func computeAssessment(result *DomainResult, dkimComplete bool) Assessment {",
+    "internal/collector/collector.go:394": "\tspfRecord, dmarcRecord := result.SPF.Record, result.DMARC.Record",
+    "internal/collector/collector.go:395": "\tenforced, hasReporting := false, false",
+    "internal/collector/collector.go:396": "\tissues := []string{}",
+    "internal/collector/collector.go:397": "",
+    "internal/collector/collector.go:398": "\t// Check SPF",
+    "internal/collector/collector.go:399": "\tif spfRecord == nil {",
+    "internal/collector/collector.go:400": "\t\tissues = append(issues, \"No SPF record\")",
+    "internal/collector/collector.go:401": "\t} else if !spfRecord.Valid {",
+    "internal/collector/collector.go:402": "\t\tissues = append(issues, \"Invalid SPF record\")",
+    "internal/collector/collector.go:403": "\t}",
+    "internal/collector/collector.go:404": "",
+    "internal/collector/collector.go:405": "\t// Check DMARC",
+    "internal/collector/collector.go:406": "\tif dmarcRecord == nil {",
+    "internal/collector/collector.go:407": "\t\tissues = append(issues, \"No DMARC record\")",
+    "internal/collector/collector.go:408": "\t} else if !dmarcRecord.Valid {",
+    "internal/collector/collector.go:409": "\t\tissues = append(issues, \"Invalid DMARC record\")",
+    "internal/collector/collector.go:410": "\t} else {",
+    "internal/collector/collector.go:411": "\t\tr := dmarcRecord.parsed",
+    "internal/collector/collector.go:412": "\t\t// The record's p applies when the record is the domain's own, and",
+    "internal/collector/collector.go:413": "\t\t// its subdomain policy applies when the record is above it. Under",
+    "internal/collector/collector.go:414": "\t\t// t=y, receivers apply that policy one level lower.",
+    "internal/collector/collector.go:415": "\t\trequested, _ := r.Requested(dmarcRecord.above, true)",
+    "internal/collector/collector.go:416": "\t\tif r.Applied(requested) == dmarc.Reject {",
+    "internal/collector/collector.go:417": "\t\t\tenforced = true",
+    "internal/collector/collector.go:418": "\t\t}",
+    "internal/collector/collector.go:419": "\t\tswitch requested {",
+    "internal/collector/collector.go:420": "\t\tcase dmarc.None:",
+    "internal/collector/collector.go:421": "\t\t\tissues = append(issues, \"DMARC policy is 'none' (monitoring only)\")",
+    "internal/collector/collector.go:422": "\t\tcase dmarc.Quarantine:",
+    "internal/collector/collector.go:423": "\t\t\tissues = append(issues, \"DMARC policy is 'quarantine' (not reject)\")",
+    "internal/collector/collector.go:424": "\t\t}",
+    "internal/collector/collector.go:425": "\t\tif r.Testing \u0026\u0026 requested != dmarc.None {",
+    "internal/collector/collector.go:426": "\t\t\tissues = append(issues, \"DMARC policy is in testing mode (t=y), so receivers apply it one level lower\")",
+    "internal/collector/collector.go:427": "\t\t}",
+    "internal/collector/collector.go:428": "\t\tfor _, tag := range []string{\"p\", \"sp\", \"np\"} {",
+    "internal/collector/collector.go:429": "\t\t\tif slices.Contains(r.Invalid, tag) \u0026\u0026 (tag != \"p\" || r.P == \"\") {",
+    "internal/collector/collector.go:430": "\t\t\t\tissues = append(issues, \"DMARC \"+tag+\"= tag has an invalid value, so receivers treat the record as p=none\")",
+    "internal/collector/collector.go:431": "\t\t\t}",
+    "internal/collector/collector.go:432": "\t\t}",
+    "internal/collector/collector.go:433": "",
+    "internal/collector/collector.go:434": "\t\thasReporting = len(r.RUA) \u003e 0",
+    "internal/collector/collector.go:435": "\t\tif !hasReporting {",
+    "internal/collector/collector.go:436": "\t\t\tissues = append(issues, \"No DMARC aggregate reporting (rua) configured\")",
+    "internal/collector/collector.go:437": "\t\t}",
+    "internal/collector/collector.go:438": "\t\tif len(r.BadRUA) \u003e 0 {",
+    "internal/collector/collector.go:439": "\t\t\tissues = append(issues, \"DMARC rua has an address that is not a URI, such as one without mailto:\")",
+    "internal/collector/collector.go:440": "\t\t}",
+    "internal/collector/collector.go:441": "",
+    "internal/collector/collector.go:442": "\t\tif dmarcRecord.SubdomainPolicy != \"reject\" {",
+    "internal/collector/collector.go:443": "\t\t\tissues = append(issues, \"Subdomain policy is not 'reject'\")",
+    "internal/collector/collector.go:444": "\t\t}",
+    "internal/collector/collector.go:445": "\t}",
+    "internal/collector/collector.go:446": "",
+    "internal/collector/collector.go:447": "\t// Check DKIM (note: only common selectors are checked, custom selectors may exist)",
+    "internal/collector/collector.go:448": "\thasValidDKIM := false",
+    "internal/collector/collector.go:449": "\tif len(result.DKIM) == 0 {",
+    "internal/collector/collector.go:450": "\t\tissues = append(issues, \"No DKIM records found for common selectors (custom selectors not checked)\")",
+    "internal/collector/collector.go:451": "\t} else {",
+    "internal/collector/collector.go:452": "\t\tfor _, dkim := range result.DKIM {",
+    "internal/collector/collector.go:453": "\t\t\tif dkim.Valid {",
+    "internal/collector/collector.go:454": "\t\t\t\thasValidDKIM = true",
+    "internal/collector/collector.go:455": "\t\t\t\tbreak",
+    "internal/collector/collector.go:456": "\t\t\t}",
+    "internal/collector/collector.go:457": "\t\t}",
+    "internal/collector/collector.go:458": "\t\tif !hasValidDKIM {",
+    "internal/collector/collector.go:459": "\t\t\tissues = append(issues, \"No valid DKIM records (all keys are malformed or revoked)\")",
+    "internal/collector/collector.go:460": "\t\t}",
+    "internal/collector/collector.go:461": "\t}",
+    "internal/collector/collector.go:462": "",
+    "internal/collector/collector.go:463": "\tvar assessment Assessment",
+    "internal/collector/collector.go:464": "\tif result.DMARC.Read {",
+    "internal/collector/collector.go:465": "\t\tassessment.Enforced, assessment.HasReporting = new(enforced), new(hasReporting)",
+    "internal/collector/collector.go:466": "\t}",
+    "internal/collector/collector.go:467": "\t// A selector whose lookup failed could only add keys, so a valid key",
+    "internal/collector/collector.go:468": "\t// already read settles the DKIM check.",
+    "internal/collector/collector.go:469": "\tif result.SPF.Read \u0026\u0026 result.DMARC.Read \u0026\u0026 (dkimComplete || hasValidDKIM) {",
+    "internal/collector/collector.go:470": "\t\tassessment.Issues = issues",
+    "internal/collector/collector.go:471": "\t}",
+    "internal/collector/collector.go:472": "\treturn assessment",
+    "internal/collector/collector.go:473": "}",
+    "internal/collector/collector.go:486": "\tswitch {",
+    "internal/collector/collector.go:487": "\tcase holds:",
+    "internal/collector/collector.go:488": "\t\tt.holds++",
+    "internal/collector/collector.go:489": "\tcase err != nil:",
+    "internal/collector/collector.go:490": "\t\tt.unread++",
+    "internal/collector/collector.go:498": "\ttotal := len(scans)",
+    "internal/collector/collector.go:500": "\t\tTotalDomains: total,",
+    "internal/collector/collector.go:503": "\tif total == 0 {",
+    "internal/collector/collector.go:507": "\tvar withMX, withSPF, withDMARC, withDKIM, withAllThree, enforced, withReporting tally",
+    "internal/collector/collector.go:520": "\tsummary.WithMxCount, summary.WithMxPct = s.share(\"with_mx\", withMX, total)",
+    "internal/collector/collector.go:521": "\tsummary.WithSpfCount, summary.WithSpfPct = s.share(\"with_spf\", withSPF, total)",
+    "internal/collector/collector.go:522": "\tsummary.WithDmarcCount, summary.WithDmarcPct = s.share(\"with_dmarc\", withDMARC, total)",
+    "internal/collector/collector.go:523": "\tsummary.WithDkimCount, summary.WithDkimPct = s.share(\"with_dkim\", withDKIM, total)",
+    "internal/collector/collector.go:524": "\tsummary.WithAllThreeCount, summary.WithAllThreePct = s.share(\"with_all_three\", withAllThree, total)",
+    "internal/collector/collector.go:525": "\tsummary.EnforcedCount, summary.EnforcedPct = s.share(\"enforced\", enforced, total)",
+    "internal/collector/collector.go:526": "\tsummary.WithReportingCount, summary.WithReportingPct = s.share(\"with_reporting\", withReporting, total)",
+    "internal/collector/collector.go:527": "\tif enforced.unread \u003e 0 {",
+    "internal/collector/collector.go:528": "\t\ts.rec.Partial(summaryAt(\"all_enforced\"), enforced.unread, enforced.err)",
+    "internal/collector/collector.go:530": "\t\tsummary.AllEnforced = new(enforced.holds == total)",
+    "internal/collector/collector.go:539": "func (s *scanner) share(name string, t tally, total int) (count, pct *int) {",
+    "internal/collector/collector.go:540": "\ts.rec.Helper()",
+    "internal/collector/collector.go:541": "\tif t.unread \u003e 0 {",
+    "internal/collector/collector.go:542": "\t\ts.rec.Partial(summaryAt(name+\"_count\"), t.unread, t.err)",
+    "internal/collector/collector.go:543": "\t\ts.rec.Partial(summaryAt(name+\"_pct\"), t.unread, t.err)",
+    "internal/collector/collector.go:544": "\t\treturn nil, nil",
     "internal/collector/collector.go:545": "\t}",
-    "internal/collector/collector.go:546": "\treturn assessment",
+    "internal/collector/collector.go:546": "\treturn new(t.holds), new(t.holds * 100 / total)",
     "internal/collector/collector.go:547": "}",
-    "internal/collector/collector.go:560": "\tswitch {",
-    "internal/collector/collector.go:561": "\tcase holds:",
-    "internal/collector/collector.go:562": "\t\tt.holds++",
-    "internal/collector/collector.go:563": "\tcase err != nil:",
-    "internal/collector/collector.go:564": "\t\tt.unread++",
-    "internal/collector/collector.go:572": "\ttotal := len(scans)",
-    "internal/collector/collector.go:574": "\t\tTotalDomains: total,",
-    "internal/collector/collector.go:577": "\tif total == 0 {",
-    "internal/collector/collector.go:581": "\tvar withMX, withSPF, withDMARC, withDKIM, withAllThree, enforced, withReporting tally",
-    "internal/collector/collector.go:594": "\tsummary.WithMxCount, summary.WithMxPct = s.share(\"with_mx\", withMX, total)",
-    "internal/collector/collector.go:595": "\tsummary.WithSpfCount, summary.WithSpfPct = s.share(\"with_spf\", withSPF, total)",
-    "internal/collector/collector.go:596": "\tsummary.WithDmarcCount, summary.WithDmarcPct = s.share(\"with_dmarc\", withDMARC, total)",
-    "internal/collector/collector.go:597": "\tsummary.WithDkimCount, summary.WithDkimPct = s.share(\"with_dkim\", withDKIM, total)",
-    "internal/collector/collector.go:598": "\tsummary.WithAllThreeCount, summary.WithAllThreePct = s.share(\"with_all_three\", withAllThree, total)",
-    "internal/collector/collector.go:599": "\tsummary.EnforcedCount, summary.EnforcedPct = s.share(\"enforced\", enforced, total)",
-    "internal/collector/collector.go:600": "\tsummary.WithReportingCount, summary.WithReportingPct = s.share(\"with_reporting\", withReporting, total)",
-    "internal/collector/collector.go:601": "\tif enforced.unread \u003e 0 {",
-    "internal/collector/collector.go:602": "\t\ts.rec.Partial(summaryAt(\"all_enforced\"), enforced.unread, enforced.err)",
-    "internal/collector/collector.go:604": "\t\tsummary.AllEnforced = new(enforced.holds == total)",
-    "internal/collector/collector.go:613": "func (s *scanner) share(name string, t tally, total int) (count, pct *int) {",
-    "internal/collector/collector.go:614": "\ts.rec.Helper()",
-    "internal/collector/collector.go:615": "\tif t.unread \u003e 0 {",
-    "internal/collector/collector.go:616": "\t\ts.rec.Partial(summaryAt(name+\"_count\"), t.unread, t.err)",
-    "internal/collector/collector.go:617": "\t\ts.rec.Partial(summaryAt(name+\"_pct\"), t.unread, t.err)",
-    "internal/collector/collector.go:618": "\t\treturn nil, nil",
-    "internal/collector/collector.go:619": "\t}",
-    "internal/collector/collector.go:620": "\treturn new(t.holds), new(t.holds * 100 / total)",
-    "internal/collector/collector.go:621": "}",
-    "internal/collector/collector.go:624": "\tvar domainErrors []string",
-    "internal/collector/collector.go:626": "\tfor _, d := range domains {",
-    "internal/collector/collector.go:627": "\t\tfor _, err := range d.Errors {",
-    "internal/collector/collector.go:628": "\t\t\tdomainErrors = append(domainErrors, d.Domain+\": \"+err)",
-    "internal/collector/collector.go:632": "\tif len(domainErrors) == 0 {",
-    "internal/collector/collector.go:637": "\t\tDomainErrors: domainErrors,",
-    "internal/collector/handler.go:31": "\tdomains, err := getStringSlice(ctx.Config(), \"domains\")",
-    "internal/collector/handler.go:32": "\tif err != nil {",
-    "internal/collector/handler.go:36": "\tif len(domains) == 0 {",
-    "internal/collector/handler.go:41": "\t\tDomains:    domains,"
+    "internal/collector/collector.go:550": "\tvar domainErrors []string",
+    "internal/collector/collector.go:552": "\tfor _, d := range domains {",
+    "internal/collector/collector.go:553": "\t\tfor _, err := range d.Errors {",
+    "internal/collector/collector.go:554": "\t\t\tdomainErrors = append(domainErrors, d.Domain+\": \"+err)",
+    "internal/collector/collector.go:558": "\tif len(domainErrors) == 0 {",
+    "internal/collector/collector.go:563": "\t\tDomainErrors: domainErrors,",
+    "internal/collector/handler.go:36": "\tdomains, err := getStringSlice(ctx.Config(), \"domains\")",
+    "internal/collector/handler.go:37": "\tif err != nil {",
+    "internal/collector/handler.go:41": "\tif len(domains) == 0 {",
+    "internal/collector/handler.go:51": "\t\tDomains:    domains,",
+    "internal/dmarc/dmarc.go:114": "\tswitch name {",
+    "internal/dmarc/dmarc.go:152": "\tcase \"rua\":",
+    "internal/dmarc/dmarc.go:153": "\t\tr.RUA, r.BadRUA = uris(value)",
+    "internal/dmarc/dmarc.go:158": "\tcase \"pct\", \"rf\", \"ri\":",
+    "internal/dmarc/dmarc.go:159": "\t\tif r.Legacy == nil {",
+    "internal/dmarc/dmarc.go:160": "\t\t\tr.Legacy = map[string]string{}",
+    "internal/dmarc/dmarc.go:162": "\t\tr.Legacy[name] = value",
+    "internal/dmarc/dmarc.go:280": "\tdomain = trimDot(domain)",
+    "internal/dmarc/dmarc.go:281": "\tvar queried []string",
+    "internal/dmarc/dmarc.go:282": "\tquery := func(name string) (Record, bool, error) {",
+    "internal/dmarc/dmarc.go:283": "\t\tqueried = append(queried, \"_dmarc.\"+name)",
+    "internal/dmarc/dmarc.go:286": "\town, ok, err := query(domain)",
+    "internal/dmarc/dmarc.go:287": "\tif err != nil {",
+    "internal/dmarc/dmarc.go:288": "\t\treturn Found{Queried: queried}, false, err",
+    "internal/dmarc/dmarc.go:290": "\tif ok {",
+    "internal/dmarc/dmarc.go:291": "\t\treturn Found{Record: own, At: domain, Queried: queried}, true, nil",
+    "internal/dmarc/dmarc.go:293": "\tlabels := strings.Split(domain, \".\")",
+    "internal/dmarc/dmarc.go:294": "\tif len(labels) \u003e maxLabels+1 {",
+    "internal/dmarc/dmarc.go:295": "\t\tlabels = labels[len(labels)-maxLabels:]",
+    "internal/dmarc/dmarc.go:297": "\t\tlabels = labels[1:]",
+    "internal/dmarc/dmarc.go:303": "\tvar hits []hit",
+    "internal/dmarc/dmarc.go:304": "\tfor ; len(labels) \u003e 0; labels = labels[1:] {",
+    "internal/dmarc/dmarc.go:305": "\t\tname := strings.Join(labels, \".\")",
+    "internal/dmarc/dmarc.go:306": "\t\tr, ok, err := query(name)",
+    "internal/dmarc/dmarc.go:307": "\t\tif err != nil {",
+    "internal/dmarc/dmarc.go:308": "\t\t\treturn Found{Queried: queried}, false, err",
+    "internal/dmarc/dmarc.go:310": "\t\tif !ok {",
+    "internal/dmarc/dmarc.go:313": "\t\thits = append(hits, hit{name, r})",
+    "internal/dmarc/dmarc.go:318": "\tif len(hits) == 0 {",
+    "internal/dmarc/dmarc.go:319": "\t\treturn Found{Queried: queried}, false, nil",
+    "internal/dmarc/dmarc.go:337": "\treturn Found{Record: pick.record, At: pick.name, Queried: queried}, true, nil"
   }
 }

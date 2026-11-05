@@ -143,8 +143,8 @@ Each domain includes an `assessment` object:
 
 | Field | Description |
 |-------|-------------|
-| `enforced` | `true` if DMARC policy is `reject` with `pct=100` |
-| `has_reporting` | `true` if `rua` (aggregate reports) is configured |
+| `enforced` | `true` if the DMARC policy that applies to the domain is `reject`, without `t=y`. For a subdomain with no record of its own, the subdomain policy of the record above it applies, as RFC 9989 specifies |
+| `has_reporting` | `true` if that DMARC record's `rua` lists a valid URI, such as `mailto:dmarc@example.com` |
 | `issues` | List of problems found |
 
 ### Summary Metrics
@@ -154,12 +154,12 @@ Each domain includes an `assessment` object:
 | `total_domains` | Number of domains scanned |
 | `with_mx_pct` | Percentage of domains with MX records |
 | `with_spf_pct` | Percentage of domains with SPF records |
-| `with_dmarc_pct` | Percentage of domains with DMARC records |
+| `with_dmarc_pct` | Percentage of domains that a DMARC record applies to, their own or a parent domain's |
 | `with_dkim_pct` | Percentage of domains with DKIM records |
 | `with_all_three_pct` | Percentage with MX + SPF + DMARC |
-| `enforced_pct` | Percentage with DMARC `p=reject` |
-| `with_reporting_pct` | Percentage with aggregate reporting (`rua`) |
-| `all_enforced` | `true` only if ALL domains have `p=reject` |
+| `enforced_pct` | Percentage with `assessment.enforced` true |
+| `with_reporting_pct` | Percentage with a valid aggregate report URI (`rua`) |
+| `all_enforced` | `true` only if `assessment.enforced` is `true` for ALL domains |
 
 Each percentage has a count beside it, such as `with_mx_count`, the number of domains it counts. The percentage is that count over `total_domains`, rounded down.
 

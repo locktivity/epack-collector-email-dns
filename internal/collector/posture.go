@@ -6,6 +6,7 @@ import (
 	"net"
 	"time"
 
+	"github.com/locktivity/epack-collector-email-dns/internal/dmarc"
 	"github.com/locktivity/epack/componentsdk"
 )
 
@@ -69,7 +70,8 @@ type DomainResult struct {
 	// SPF record (TXT record starting with v=spf1)
 	SPF Lookup[SPFRecord] `json:"spf,omitzero"`
 
-	// DMARC record (_dmarc.domain TXT)
+	// DMARC record that applies to the domain: its own, or the one the DNS
+	// tree walk finds above it
 	DMARC Lookup[DMARCRecord] `json:"dmarc,omitzero"`
 
 	// DKIM records at the common selectors. When some selectors' lookups
@@ -103,9 +105,10 @@ func (l Lookup[T]) MarshalJSON() ([]byte, error) { return json.Marshal(l.Record)
 // SPF or DMARC lookup failed, or when a DKIM selector's lookup failed and no
 // valid key was read.
 type Assessment struct {
-	// Enforced is true if DMARC policy is "reject"
+	// Enforced is true if the DMARC policy that applies to the domain is
+	// reject, without t=y
 	Enforced *bool `json:"enforced,omitempty"`
-	// HasReporting is true if rua (aggregate reports) is configured
+	// HasReporting is true if the DMARC record lists a valid rua URI
 	HasReporting *bool `json:"has_reporting,omitempty"`
 	// Issues lists any problems found
 	Issues []string `json:"issues,omitzero"`
@@ -126,12 +129,17 @@ type SPFRecord struct {
 // DMARCRecord represents a DMARC policy.
 type DMARCRecord struct {
 	Record          string `json:"record"`
-	Policy          string `json:"policy"`           // none, quarantine, reject
+	Policy          string `json:"policy"`           // none, quarantine, reject, or unknown
 	SubdomainPolicy string `json:"subdomain_policy"` // sp= value, defaults to policy if not set
-	Pct             int    `json:"pct"`              // percentage of messages to apply policy (default 100)
-	RUA             string `json:"rua,omitempty"`    // aggregate report URI
-	RUF             string `json:"ruf,omitempty"`    // forensic report URI
+	Pct             int    `json:"pct"`              // RFC 7489's pct tag, which RFC 9989 drops (default 100)
+	RUA             string `json:"rua,omitempty"`    // aggregate report URIs
+	RUF             string `json:"ruf,omitempty"`    // failure report URIs
 	Valid           bool   `json:"valid"`
+
+	// parsed is the record as RFC 9989 reads it. above is true when the
+	// DNS tree walk found it above the domain.
+	parsed dmarc.Record
+	above  bool
 }
 
 // DKIMRecord represents a DKIM selector record.
@@ -156,9 +164,9 @@ type Summary struct {
 	WithDkimPct        *int  `json:"with_dkim_pct,omitempty"`
 	WithAllThreeCount  *int  `json:"with_all_three_count,omitempty"` // MX + SPF + DMARC
 	WithAllThreePct    *int  `json:"with_all_three_pct,omitempty"`
-	EnforcedCount      *int  `json:"enforced_count,omitempty"` // DMARC p=reject at pct=100
+	EnforcedCount      *int  `json:"enforced_count,omitempty"` // assessment.enforced is true
 	EnforcedPct        *int  `json:"enforced_pct,omitempty"`
-	WithReportingCount *int  `json:"with_reporting_count,omitempty"` // rua configured
+	WithReportingCount *int  `json:"with_reporting_count,omitempty"` // a valid rua URI
 	WithReportingPct   *int  `json:"with_reporting_pct,omitempty"`
-	AllEnforced        *bool `json:"all_enforced,omitempty"` // true if all domains have p=reject
+	AllEnforced        *bool `json:"all_enforced,omitempty"` // true if every domain is enforced
 }

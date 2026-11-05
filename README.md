@@ -83,15 +83,15 @@ The release workflow:
 
 ## Output Schema
 
-The collector outputs to `artifacts/email-dns.json`. See [docs/schema/v1.0.0.json](docs/schema/v1.0.0.json) for the full JSON schema.
+The collector outputs to `artifacts/email-dns.email-dns.json`, an `evidencepack/email-dns@v1` artifact. The SDK's [evidencepack/email-dns@v1 schema](https://github.com/locktivity/epack/blob/main/componentsdk/schema/normalized/email-dns.v1.json) describes every field. [docs/schema/methods.json](docs/schema/methods.json) says how this collector measures each one.
 
 ### Key Fields
 
 | Field | Description |
 |-------|-------------|
-| `assessment.enforced` | `true` if DMARC policy is `reject` with `pct=100` |
-| `assessment.has_reporting` | `true` if `rua` (aggregate reports) is configured |
-| `summary.all_enforced` | `true` only if ALL domains have `p=reject` |
+| `assessment.enforced` | `true` if the DMARC policy that applies to the domain is `reject`, without `t=y`. For a subdomain with no record of its own, the subdomain policy of the record above it applies, as RFC 9989 specifies |
+| `assessment.has_reporting` | `true` if that DMARC record's `rua` lists a valid URI, such as `mailto:dmarc@example.com` |
+| `summary.all_enforced` | `true` only if `assessment.enforced` is `true` for ALL domains |
 
 ### Partial Collection
 
@@ -109,7 +109,8 @@ For full compliance per the email authentication requirements:
 - [Overview](docs/overview.md) - What it collects and how it works
 - [Configuration](docs/configuration.md) - Setup and options
 - [Examples](docs/examples.md) - Usage examples and sample output
-- [Schema](docs/schema/v1.0.0.json) - JSON schema for output
+- [Schema](https://github.com/locktivity/epack/blob/main/componentsdk/schema/normalized/email-dns.v1.json) - the SDK's JSON schema for the output
+- [Methods](docs/schema/methods.json) - how the collector measures each field
 
 ## License
 

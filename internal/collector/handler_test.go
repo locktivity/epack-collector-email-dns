@@ -15,6 +15,7 @@ func TestRunRejectsInvalidDomains(t *testing.T) {
 		{"empty list", map[string]any{"domains": []any{}}},
 		{"not a list", map[string]any{"domains": "example.com"}},
 		{"not a string", map[string]any{"domains": []any{"example.com", 42}}},
+		{"a Unicode domain with no A-label", map[string]any{"domains": []any{"example.com", "-bücher.example"}}},
 	}
 
 	for _, tt := range tests {

@@ -16,6 +16,11 @@ const kitResultPath = "artifacts/email-dns.collector-result.json"
 
 const noDKIMIssue = "No DKIM records found for common selectors (custom selectors not checked)"
 
+// kitAudit is the config of the scenarios that pin call counts, or each
+// gap's call number and unmeasured count. The collector result has these
+// only at the audit level and above.
+var kitAudit = map[string]any{"level": "audit"}
+
 // kitIgnore keeps the lookup errors readers parse out of the value
 // comparison: a failed lookup adds one by design.
 func kitIgnore() map[string][]string {
@@ -110,8 +115,9 @@ func TestCollectorKit(t *testing.T) {
 				},
 			},
 			{
-				Name: "no records",
-				DNS:  kitNoRecords(),
+				Name:   "no records",
+				DNS:    kitNoRecords(),
+				Config: kitAudit,
 				Expect: map[string]map[string]any{
 					ArtifactPath: {
 						"/domains/2": map[string]any{
@@ -147,17 +153,18 @@ func TestCollectorKit(t *testing.T) {
 						"/outcome": map[string]any{"status": "collected"},
 						"/gaps":    []any{},
 						"/calls/operations": []any{
-							map[string]any{"name": "dns.dkim.lookup", "calls": 36, "attempts": 36, "retries": 0, "statuses": map[string]any{"NXDOMAIN": 36}},
-							map[string]any{"name": "dns.dmarc.lookup", "calls": 4, "attempts": 4, "retries": 0, "statuses": map[string]any{"NOERROR": 1, "NXDOMAIN": 3}},
-							map[string]any{"name": "dns.mx.lookup", "calls": 4, "attempts": 4, "retries": 0, "statuses": map[string]any{"NXDOMAIN": 4}},
-							map[string]any{"name": "dns.spf.lookup", "calls": 4, "attempts": 4, "retries": 0, "statuses": map[string]any{"NOERROR": 1, "NXDOMAIN": 3}},
+							kitOperation("dns.dkim.lookup", 36, map[string]any{"NXDOMAIN": 36}),
+							kitOperation("dns.dmarc.lookup", 8, map[string]any{"NOERROR": 1, "NXDOMAIN": 7}),
+							kitOperation("dns.mx.lookup", 4, map[string]any{"NXDOMAIN": 4}),
+							kitOperation("dns.spf.lookup", 4, map[string]any{"NOERROR": 1, "NXDOMAIN": 3}),
 						},
 					},
 				},
 			},
 			{
-				Name: "SERVFAIL answers",
-				DNS:  kitFailedLookups(),
+				Name:   "SERVFAIL answers",
+				DNS:    kitFailedLookups(),
+				Config: kitAudit,
 				Expect: map[string]map[string]any{
 					ArtifactPath: {
 						"/domains/0/mx": []any{
@@ -181,13 +188,13 @@ func TestCollectorKit(t *testing.T) {
 								kitGap("/domains/0/assessment/issues", "not_collected", 0, "dns.spf.lookup", 5),
 								kitGap("/domains/0/dmarc", "not_collected", 0, "dns.dmarc.lookup", 9),
 								kitGap("/domains/0/spf", "not_collected", 0, "dns.spf.lookup", 5),
-								kitGap("/domains/2/assessment/issues", "not_collected", 0, "dns.dkim.lookup", 35),
-								kitGap("/domains/2/dkim", "partial", 1, "dns.dkim.lookup", 35),
+								kitGap("/domains/2/assessment/issues", "not_collected", 0, "dns.dkim.lookup", 36),
+								kitGap("/domains/2/dkim", "partial", 1, "dns.dkim.lookup", 36),
 								kitGap("/summary/all_enforced", "partial", 1, "dns.dmarc.lookup", 9),
 							},
 							kitShareGaps("enforced", 1, "dns.dmarc.lookup", 9),
 							kitShareGaps("with_all_three", 1, "dns.spf.lookup", 5),
-							kitShareGaps("with_dkim", 1, "dns.dkim.lookup", 35),
+							kitShareGaps("with_dkim", 1, "dns.dkim.lookup", 36),
 							kitShareGaps("with_dmarc", 1, "dns.dmarc.lookup", 9),
 							kitShareGaps("with_reporting", 1, "dns.dmarc.lookup", 9),
 							kitShareGaps("with_spf", 1, "dns.spf.lookup", 5),
@@ -196,8 +203,9 @@ func TestCollectorKit(t *testing.T) {
 				},
 			},
 			{
-				Name: "DKIM selector SERVFAIL",
-				DNS:  kitFailedSelectors(),
+				Name:   "DKIM selector SERVFAIL",
+				DNS:    kitFailedSelectors(),
+				Config: kitAudit,
 				Expect: map[string]map[string]any{
 					ArtifactPath: {
 						"/domains/0/dkim": []any{
@@ -213,9 +221,9 @@ func TestCollectorKit(t *testing.T) {
 					kitResultPath: merged(
 						map[string]any{"/outcome": map[string]any{"status": "partial", "code": "vendor_error", "owner": "vendor"}},
 						kitGapPins(
-							kitGap("/domains/0/dkim", "partial", 1, "dns.dkim.lookup", 13),
-							kitGap("/domains/1/assessment/issues", "not_collected", 0, "dns.dkim.lookup", 28),
-							kitGap("/domains/1/dkim", "partial", 1, "dns.dkim.lookup", 28),
+							kitGap("/domains/0/dkim", "partial", 1, "dns.dkim.lookup", 14),
+							kitGap("/domains/1/assessment/issues", "not_collected", 0, "dns.dkim.lookup", 29),
+							kitGap("/domains/1/dkim", "partial", 1, "dns.dkim.lookup", 29),
 						),
 					),
 				},
@@ -225,6 +233,17 @@ func TestCollectorKit(t *testing.T) {
 		Operations:    []string{"dns.mx.lookup", "dns.spf.lookup", "dns.dmarc.lookup", "dns.dkim.lookup"},
 		GapOperations: true,
 	})
+}
+
+// kitOperation is an operation's entry in the result of a run at the audit
+// level, for an operation with no retries. statuses holds its call counts by
+// DNS rcode.
+func kitOperation(name string, calls int, statuses map[string]any) map[string]any {
+	codes := slices.Sorted(maps.Keys(statuses))
+	return map[string]any{
+		"name": name, "calls": calls, "attempts": calls, "retries": 0, "statuses": statuses,
+		"retried": false, "status_codes": codes,
+	}
 }
 
 // merged returns the pins of each map in one.

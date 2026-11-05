@@ -9,7 +9,10 @@ import (
 )
 
 // ArtifactPath is the posture artifact's path in the pack.
-const ArtifactPath = "artifacts/email-dns.json"
+const ArtifactPath = "artifacts/email-dns.email-dns.json"
+
+// ArtifactSchema is the posture artifact's schema ID.
+const ArtifactSchema = "evidencepack/email-dns@v1"
 
 // Spec describes the collector to componentsdk.RunCollector.
 func Spec(version, commit string) componentsdk.CollectorSpec {
@@ -18,15 +21,17 @@ func Spec(version, commit string) componentsdk.CollectorSpec {
 		Version:     version,
 		Commit:      commit,
 		Description: "Collects email DNS security posture (MX, SPF, DMARC, DKIM)",
-		Schemas:     schema.Schemas(),
+		Methods:     schema.Methods(),
 		TraceMap:    schema.TraceMap,
 		Timeout:     30 * time.Minute,
+		Writes:      []string{ArtifactSchema},
 	}
 }
 
 // Run is the collector's handler. It fails only for invalid configuration,
 // and otherwise emits what it collected with a gap recorded for each value a
-// failed lookup left out.
+// failed lookup left out. A Unicode domain with no A-label form is invalid
+// configuration.
 func Run(ctx componentsdk.CollectorContext) error {
 	domains, err := getStringSlice(ctx.Config(), "domains")
 	if err != nil {
@@ -35,6 +40,11 @@ func Run(ctx componentsdk.CollectorContext) error {
 
 	if len(domains) == 0 {
 		return componentsdk.NewConfigError("domains is required")
+	}
+	for _, domain := range domains {
+		if _, err := lookupName(domain); err != nil {
+			return componentsdk.NewConfigError("domains: %q is not a valid domain name (%v)", domain, err)
+		}
 	}
 
 	posture := Collect(ctx.Context(), Config{
@@ -49,7 +59,7 @@ func Run(ctx componentsdk.CollectorContext) error {
 		{
 			Data:   posture,
 			Path:   ArtifactPath,
-			Schema: "evidencepack/email-dns@v1",
+			Schema: ArtifactSchema,
 		},
 	})
 }

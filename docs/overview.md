@@ -11,7 +11,7 @@ This collector queries DNS for each configured domain and aggregates email authe
 - **DMARC Records**: Domain-based Message Authentication policy including:
   - Policy (none/quarantine/reject)
   - Subdomain policy
-  - Percentage applied
+  - The legacy pct tag, which RFC 9989 removed and receivers ignore
   - Aggregate reporting URI (rua)
   - Forensic reporting URI (ruf)
 - **DKIM Records**: DomainKeys Identified Mail (checks common selectors)
@@ -32,7 +32,7 @@ All metrics include enforcement status (whether DMARC is set to `p=reject`) and 
 2. For each domain, it performs DNS lookups:
    - MX records for mail servers
    - TXT records for SPF (v=spf1)
-   - TXT records at `_dmarc.domain` for DMARC
+   - TXT records at `_dmarc.domain` for DMARC. When the domain has no DMARC record, the lookups continue above it, as the DNS tree walk in RFC 9989 does
    - TXT records at `selector._domainkey.domain` for common DKIM selectors
 3. Records are parsed and validated
 4. Per-domain assessment is computed (enforced, has reporting, issues)

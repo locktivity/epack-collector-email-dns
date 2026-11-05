@@ -6,10 +6,12 @@ import (
 	"fmt"
 	"net"
 	"reflect"
+	"slices"
 	"strings"
 	"testing"
 	"time"
 
+	"github.com/locktivity/epack-collector-email-dns/internal/dmarc"
 	"github.com/locktivity/epack/componentsdk"
 )
 
@@ -22,6 +24,12 @@ func show[T any](v *T) string {
 		return "left out"
 	}
 	return fmt.Sprint(*v)
+}
+
+// parseDMARC describes record as the domain's own DMARC record.
+func parseDMARC(record string) *DMARCRecord {
+	r, _ := dmarc.Parse(record)
+	return newDMARCRecord(record, r, false)
 }
 
 func TestParseDMARC(t *testing.T) {
@@ -65,6 +73,42 @@ func TestParseDMARC(t *testing.T) {
 			wantPct:    100,
 			wantRUA:    "",
 		},
+		{
+			name:       "no p tag with a report URI is treated as p=none",
+			record:     "v=DMARC1; rua=mailto:dmarc@example.com",
+			wantPolicy: "none",
+			wantSP:     "none",
+			wantPct:    100,
+			wantRUA:    "mailto:dmarc@example.com",
+		},
+		{
+			name:       "no p tag and no report URI",
+			record:     "v=DMARC1",
+			wantPolicy: "unknown",
+			wantSP:     "unknown",
+			wantPct:    100,
+		},
+		{
+			name:       "sp tag without a p tag",
+			record:     "v=DMARC1; sp=reject",
+			wantPolicy: "unknown",
+			wantSP:     "unknown",
+			wantPct:    100,
+		},
+		{
+			name:       "invalid p tag",
+			record:     "v=DMARC1; p=bogus",
+			wantPolicy: "unknown",
+			wantSP:     "unknown",
+			wantPct:    100,
+		},
+		{
+			name:       "policy in capitals",
+			record:     "v=DMARC1; p=Quarantine",
+			wantPolicy: "quarantine",
+			wantSP:     "quarantine",
+			wantPct:    100,
+		},
 	}
 
 	for _, tt := range tests {
@@ -106,6 +150,20 @@ func TestValidateSPF(t *testing.T) {
 		{"v=spf1 -all garbage", false}, // valid mechanism + invalid term (not name=value)
 		{"v=spf10 -all", false},        // wrong version number
 		{"v=spf1x -all", false},        // version with extra chars
+		{"v=spf1 ip4:192.0.2.0/24 ip6:2001:db8::/32 include:_spf.example.com -all", true},
+		{"v=spf1 a:mail.example.com/24 mx ~all", true},
+		{"v=spf1 +a ?mx redirect=_spf.example.com", true},
+		{"v=spf1 ipv4:192.0.2.10 -all", false},
+		// Receivers return permerror for each of these, as RFC 7208 sections
+		// 4.6, 5.2, and 5.6 define the grammar.
+		{"v=spf1 ip4: -all", false},
+		{"v=spf1 ip4:not-an-address -all", false},
+		{"v=spf1 ip4:192.0.2.256 -all", false},
+		{"v=spf1 ip4:192.0.2.1, include:_spf.example.com -all", false},
+		{"v=spf1 ip4:192.0.2.0/33 -all", false},
+		{"v=spf1 ip6:not-an-address -all", false},
+		{"v=spf1 include: -all", false},
+		{"v=spf1 ~-all", false},
 	}
 
 	for _, tt := range tests {
@@ -117,7 +175,7 @@ func TestValidateSPF(t *testing.T) {
 	}
 }
 
-func TestValidateDMARC(t *testing.T) {
+func TestDMARCRecordValid(t *testing.T) {
 	tests := []struct {
 		record string
 		valid  bool
@@ -128,31 +186,36 @@ func TestValidateDMARC(t *testing.T) {
 		{"v=DMARC1", false}, // no policy
 		{"p=reject", false}, // no version
 		{"not a dmarc record", false},
-		{"v=DMARC1; sp=reject", false},               // sp= without p= is invalid
-		{"v=DMARC1; rua=mailto:x@y.com", false},      // rua without p= is invalid
-		{"v=DMARC1; p=bogus", false},                 // invalid policy value
-		{"v=DMARC1; p=REJECT", true},                 // uppercase should work (case insensitive)
-		{"v=DMARC1; p=invalid; rua=mailto:x", false}, // invalid policy with other valid tags
-		{"v=DMARC10; p=reject", false},               // wrong version number
-		{"v=dmarc1x; p=reject", false},               // version with extra chars
-		{"p=reject; v=DMARC1", false},                // v= must be first tag per RFC 7489
-		{"rua=mailto:x; v=DMARC1; p=reject", false},  // v= not first
-		{"v=DMARC1; rua=mailto:x; p=reject", true},   // p= can appear after other tags (only v= must be first)
-		{"v=DMARC1; p=reject; sp=bogus", true},       // invalid sp= is ignored per receiver behavior (record still valid)
-		{"v=DMARC1; p=reject; sp=invalid", true},     // invalid sp= is ignored per receiver behavior (record still valid)
-		{"v=DMARC1; p=reject; sp=none", true},        // valid sp= value
-		{"v=DMARC1; p=reject; sp=quarantine", true},  // valid sp= value
-		{"v=DMARC1; p=reject; sp=reject", true},      // valid sp= value
-		{"v = DMARC1; p = reject", true},             // whitespace around = per RFC 7489 ABNF
-		{"v= DMARC1; p= reject", true},               // whitespace after = only
-		{"v =DMARC1; p =reject", true},               // whitespace before = only
-		{"v=DMARC1;p=reject", true},                  // no whitespace around tags
+		{"v=DMARC1; sp=reject", false},                         // sp= without p= or a report URI
+		{"v=DMARC1; rua=mailto:x@y.com", true},                 // no p=, so the report URI makes it p=none per RFC 9989
+		{"v=DMARC1; rua=x@y.com", false},                       // no p=, and the rua is not a URI
+		{"v=DMARC1; rua=mailto:x@y.com mailto:z@y.com", false}, // no p=, and a URI holds no space
+		{"v=DMARC1; p=bogus", false},                           // invalid policy value
+		{"v=DMARC1; p=REJECT", true},                           // uppercase should work (case insensitive)
+		{"v=DMARC1; p=invalid; rua=mailto:x", true},            // invalid policy with a report URI is treated as p=none
+		{"v=DMARC10; p=reject", false},                         // wrong version number
+		{"v=dmarc1x; p=reject", false},                         // version with extra chars
+		{"v=dmarc1; p=reject", false},                          // the version is case-sensitive
+		{"p=reject; v=DMARC1", false},                          // v= must be first tag per RFC 9989
+		{"rua=mailto:x; v=DMARC1; p=reject", false},            // v= not first
+		{"v=DMARC1; rua=mailto:x; p=reject", true},             // p= can appear after other tags (only v= must be first)
+		{"v=DMARC1; p=reject; sp=bogus", false},                // an invalid sp= with no report URI leaves no DMARC policy
+		{"v=DMARC1; p=reject; np=invalid", false},              // the same holds for np=
+		{"v=DMARC1; p=reject; sp=bogus; rua=mailto:x", true},   // an invalid sp= with a report URI is treated as p=none
+		{"v=DMARC1; p=reject; sp=none", true},                  // valid sp= value
+		{"v=DMARC1; p=reject; sp=quarantine", true},            // valid sp= value
+		{"v=DMARC1; p=reject; sp=reject", true},                // valid sp= value
+		{"v = DMARC1; p = reject", true},                       // whitespace around = per RFC 7489 ABNF
+		{"v= DMARC1; p= reject", true},                         // whitespace after = only
+		{"v =DMARC1; p =reject", true},                         // whitespace before = only
+		{"v=DMARC1;p=reject", true},                            // no whitespace around tags
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.record, func(t *testing.T) {
-			if got := validateDMARC(tt.record); got != tt.valid {
-				t.Errorf("validateDMARC(%q) = %v, want %v", tt.record, got, tt.valid)
+			r, isRecord := dmarc.Parse(tt.record)
+			if got := isRecord && newDMARCRecord(tt.record, r, false).Valid; got != tt.valid {
+				t.Errorf("valid for %q = %v, want %v", tt.record, got, tt.valid)
 			}
 		})
 	}
@@ -172,6 +235,19 @@ func TestValidateDKIM(t *testing.T) {
 		{"v=DKIM10; p=key", false},       // wrong version number
 		{"k=rsa; v=DKIM1; p=key", false}, // v= must be first when present per RFC 6376
 		{"p=key; v=DKIM1", false},        // v= not first
+
+		{"v = DKIM1 ; k = rsa ; p = MIGfMA0GCSqGSIb3DQEBAQUAA4GN", true},     // whitespace around the equals signs
+		{"v=DKIM1; k=rsa; p=MIGfMA0GCSqGSIb3\r\n\tDQEBAQUAA4GN", true},       // a key folded across lines
+		{"v=DKIM1; k=rsa; p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQ==", true}, // a padded key
+		{`v=DKIM1; k=rsa; p="MIGfMA0GCSqGSIb3DQEBAQUAA4GN\"`, false},         // quotes are not base64
+		{"v=DKIM1; k=rsa; p=not-a-key", false},                               // hyphens are not base64
+		{"v = DKIM2; p = MIGfMA0GCSqGSIb3DQEBAQUAA4GN", false},               // wrong version, with spaces
+		{"k=rsa; v = DKIM1; p=MIGfMA0GCSqGSIb3DQEBAQUAA4GN", false},          // v= not first, with spaces
+
+		{"V=DKIM1; K=rsa; P=MIGfMA0GCSqGSIb3DQEBAQUAA4GN", false},                                 // tag names are case-sensitive, so there is no p tag
+		{"v=dkim1; k=rsa; p=MIGfMA0GCSqGSIb3DQEBAQUAA4GN", false},                                 // the version is case-sensitive
+		{"v=DKIM1; k=rsa; p=MIGfMA0GCSqGSIb3DQEBAQUAA4GN; p=MIGfMA0GCSqGSIb3DQEBAQUAA4GN", false}, // a repeated tag makes the tag list invalid
+		{"v=DKIM1; k=rsa; k=rsa; p=MIGfMA0GCSqGSIb3DQEBAQUAA4GN", false},                          // the same holds for any tag
 	}
 
 	for _, tt := range tests {
@@ -184,14 +260,14 @@ func TestValidateDKIM(t *testing.T) {
 }
 
 func TestComputeAssessment(t *testing.T) {
+	// above describes record as one the DNS tree walk found above the
+	// domain.
+	above := func(record string) *DMARCRecord {
+		r, _ := dmarc.Parse(record)
+		return newDMARCRecord(record, r, true)
+	}
 	enforcing := func() Lookup[DMARCRecord] {
-		return read(&DMARCRecord{
-			Policy:          "reject",
-			SubdomainPolicy: "reject",
-			Pct:             100,
-			RUA:             "mailto:dmarc@example.com",
-			Valid:           true,
-		})
+		return read(parseDMARC("v=DMARC1; p=reject; sp=reject; rua=mailto:dmarc@example.com"))
 	}
 	tests := []struct {
 		name          string
@@ -226,36 +302,90 @@ func TestComputeAssessment(t *testing.T) {
 		{
 			name: "monitoring only",
 			result: DomainResult{
-				SPF: read(&SPFRecord{Valid: true}),
-				DMARC: read(&DMARCRecord{
-					Policy:          "none",
-					SubdomainPolicy: "none",
-					Pct:             100,
-					Valid:           true,
-				}),
-				DKIM: []DKIMRecord{{Valid: true}},
+				SPF:   read(&SPFRecord{Valid: true}),
+				DMARC: read(parseDMARC("v=DMARC1; p=none")),
+				DKIM:  []DKIMRecord{{Valid: true}},
 			},
 			wantEnforced:  new(false),
 			wantReporting: new(false),
 			wantIssues:    new(3), // policy none, no reporting, subdomain not reject
 		},
 		{
-			name: "enforced with invalid sp",
+			name: "reject with a legacy pct below 100",
 			result: DomainResult{
-				SPF: read(&SPFRecord{Valid: true}),
-				DMARC: read(&DMARCRecord{
-					Record:          "v=DMARC1; p=reject; sp=bogus; rua=mailto:x@example.com",
-					Policy:          "reject",
-					SubdomainPolicy: "reject", // falls back to p= when sp= is invalid
-					Pct:             100,
-					RUA:             "mailto:x@example.com",
-					Valid:           true,
-				}),
-				DKIM: []DKIMRecord{{Valid: true}},
+				SPF:   read(&SPFRecord{Valid: true}),
+				DMARC: read(parseDMARC("v=DMARC1; p=reject; pct=50; rua=mailto:dmarc@example.com")),
+				DKIM:  []DKIMRecord{{Valid: true}},
 			},
 			wantEnforced:  new(true),
 			wantReporting: new(true),
-			wantIssues:    new(1), // invalid sp= reported as issue
+			wantIssues:    new(0),
+		},
+		{
+			name: "reject in testing mode",
+			result: DomainResult{
+				SPF:   read(&SPFRecord{Valid: true}),
+				DMARC: read(parseDMARC("v=DMARC1; p=reject; t=y; rua=mailto:dmarc@example.com")),
+				DKIM:  []DKIMRecord{{Valid: true}},
+			},
+			wantEnforced:  new(false),
+			wantReporting: new(true),
+			wantIssues:    new(1), // testing mode
+		},
+		{
+			name: "invalid sp with a report URI",
+			result: DomainResult{
+				SPF:   read(&SPFRecord{Valid: true}),
+				DMARC: read(parseDMARC("v=DMARC1; p=reject; sp=bogus; rua=mailto:x@example.com")),
+				DKIM:  []DKIMRecord{{Valid: true}},
+			},
+			wantEnforced:  new(false),
+			wantReporting: new(true),
+			wantIssues:    new(3), // policy none, invalid sp=, subdomain not reject
+		},
+		{
+			name: "invalid sp without a report URI",
+			result: DomainResult{
+				SPF:   read(&SPFRecord{Valid: true}),
+				DMARC: read(parseDMARC("v=DMARC1; p=reject; sp=bogus")),
+				DKIM:  []DKIMRecord{{Valid: true}},
+			},
+			wantEnforced:  new(false),
+			wantReporting: new(false),
+			wantIssues:    new(1), // invalid DMARC record
+		},
+		{
+			name: "rua without a URI scheme",
+			result: DomainResult{
+				SPF:   read(&SPFRecord{Valid: true}),
+				DMARC: read(parseDMARC("v=DMARC1; p=reject; sp=reject; rua=dmarc@example.com")),
+				DKIM:  []DKIMRecord{{Valid: true}},
+			},
+			wantEnforced:  new(true),
+			wantReporting: new(false),
+			wantIssues:    new(2), // no reporting, an address that is not a URI
+		},
+		{
+			name: "subdomain policy of reject on a record above the domain",
+			result: DomainResult{
+				SPF:   read(&SPFRecord{Valid: true}),
+				DMARC: read(above("v=DMARC1; p=none; sp=reject; rua=mailto:dmarc@example.com")),
+				DKIM:  []DKIMRecord{{Valid: true}},
+			},
+			wantEnforced:  new(true),
+			wantReporting: new(true),
+			wantIssues:    new(0),
+		},
+		{
+			name: "p=reject on a record above the domain with sp=none",
+			result: DomainResult{
+				SPF:   read(&SPFRecord{Valid: true}),
+				DMARC: read(above("v=DMARC1; p=reject; sp=none; rua=mailto:dmarc@example.com")),
+				DKIM:  []DKIMRecord{{Valid: true}},
+			},
+			wantEnforced:  new(false),
+			wantReporting: new(true),
+			wantIssues:    new(2), // policy none, subdomain not reject
 		},
 		{
 			name: "SPF lookup failed",
@@ -506,5 +636,169 @@ func TestSummaryGapsNameTheLineThatLeavesThemOut(t *testing.T) {
 		if !strings.HasPrefix(source, "internal/collector/collector.go:") {
 			t.Errorf("source %q is not a line in collector.go", source)
 		}
+	}
+}
+
+// zoneResolver answers from fixed TXT and MX tables. A name that is not in
+// them does not exist.
+type zoneResolver struct {
+	txt map[string][]string
+	mx  map[string][]*net.MX
+}
+
+func (r zoneResolver) LookupTXT(_ context.Context, name string) ([]string, error) {
+	if v, ok := r.txt[name]; ok {
+		return v, nil
+	}
+	return nil, &net.DNSError{Err: "no such host", Name: name, IsNotFound: true}
+}
+
+func (r zoneResolver) LookupMX(_ context.Context, name string) ([]*net.MX, error) {
+	if v, ok := r.mx[name]; ok {
+		return v, nil
+	}
+	return nil, &net.DNSError{Err: "no such host", Name: name, IsNotFound: true}
+}
+
+// collectZone scans domains in res and fails the test on any gap.
+func collectZone(t *testing.T, res zoneResolver, domains ...string) *EmailDNSPosture {
+	t.Helper()
+	rec := &componentsdk.Recorder{}
+	p := Collect(context.Background(), Config{Domains: domains, Resolver: res, Recorder: rec, Now: time.Now})
+	if gaps := rec.Gaps(); len(gaps) != 0 {
+		t.Fatalf("gaps = %+v, want none", gaps)
+	}
+	return p
+}
+
+func TestCollectAppliesTheDMARCRecordAboveADomain(t *testing.T) {
+	parent := "v=DMARC1; p=reject; sp=reject; rua=mailto:dmarc@example.com"
+	res := zoneResolver{txt: map[string][]string{
+		"_dmarc.example.com":     {parent},
+		"_dmarc.own.example.com": {"v=DMARC1; p=reject; rua=mailto:dmarc@example.com"},
+		"_dmarc.example.org":     {"v=DMARC1; p=reject; sp=none; rua=mailto:dmarc@example.org"},
+	}}
+	p := collectZone(t, res, "corp.example.com", "own.example.com", "corp.example.org", "corp.example.net")
+
+	want := []struct {
+		enforced, reporting bool
+		record              string
+	}{
+		{true, true, parent},
+		{true, true, "v=DMARC1; p=reject; rua=mailto:dmarc@example.com"},
+		{false, true, "v=DMARC1; p=reject; sp=none; rua=mailto:dmarc@example.org"},
+		{false, false, ""},
+	}
+	for i, w := range want {
+		d := p.Domains[i]
+		a := d.Assessment
+		if a.Enforced == nil || *a.Enforced != w.enforced || a.HasReporting == nil || *a.HasReporting != w.reporting {
+			t.Errorf("%s: enforced = %s, has_reporting = %s, want %v, %v; issues: %v",
+				d.Domain, show(a.Enforced), show(a.HasReporting), w.enforced, w.reporting, a.Issues)
+		}
+		got := ""
+		if d.DMARC.Record != nil {
+			got = d.DMARC.Record.Record
+		}
+		if got != w.record {
+			t.Errorf("%s: dmarc.record = %q, want %q", d.Domain, got, w.record)
+		}
+		if hasNoDMARC := slices.Contains(a.Issues, "No DMARC record"); hasNoDMARC != (w.record == "") {
+			t.Errorf("%s: issues = %v", d.Domain, a.Issues)
+		}
+	}
+
+	s := p.Summary
+	for name, pair := range map[string][2]*int{
+		"with_dmarc_count":     {s.WithDmarcCount, new(3)},
+		"enforced_count":       {s.EnforcedCount, new(2)},
+		"enforced_pct":         {s.EnforcedPct, new(50)},
+		"with_reporting_count": {s.WithReportingCount, new(3)},
+	} {
+		if got, want := pair[0], pair[1]; got == nil || *got != *want {
+			t.Errorf("summary %s = %s, want %d", name, show(got), *want)
+		}
+	}
+}
+
+func TestCollectCountsReportingOnlyForReportURIs(t *testing.T) {
+	cases := []struct {
+		domain, record string
+		reporting      bool
+	}{
+		{"one.example", "v=DMARC1; p=reject; rua=mailto:dmarc@example.com", true},
+		{"many.example", "v=DMARC1; p=reject; rua=mailto:a@example.com, mailto:b@example.com!10m", true},
+		{"none.example", "v=DMARC1; p=reject", false},
+		{"bare.example", "v=DMARC1; p=reject; rua=dmarc@example.com", false},
+		{"bare-list.example", "v=DMARC1; p=reject; rua=dmarc@example.com,reports@example.com", false},
+		{"space-list.example", "v=DMARC1; p=reject; rua=mailto:a@example.com mailto:b@example.com", false},
+		{"space-colon.example", "v=DMARC1; p=reject; rua=mailto: dmarc@example.com", false},
+	}
+	txt := map[string][]string{}
+	var domains []string
+	for _, c := range cases {
+		txt["_dmarc."+c.domain] = []string{c.record}
+		domains = append(domains, c.domain)
+	}
+	p := collectZone(t, zoneResolver{txt: txt}, domains...)
+	for i, c := range cases {
+		if hr := p.Domains[i].Assessment.HasReporting; hr == nil || *hr != c.reporting {
+			t.Errorf("has_reporting for %q = %s, want %v", c.record, show(hr), c.reporting)
+		}
+	}
+	if got := p.Summary.WithReportingPct; got == nil || *got != 28 {
+		t.Errorf("summary.with_reporting_pct = %s, want 28", show(got))
+	}
+}
+
+func TestCollectLooksUpAUnicodeDomainByItsALabel(t *testing.T) {
+	res := zoneResolver{
+		txt: map[string][]string{
+			"xn--bcher-kva.example":        {"v=spf1 -all"},
+			"_dmarc.xn--bcher-kva.example": {"v=DMARC1; p=reject; rua=mailto:dmarc@example.net"},
+		},
+		mx: map[string][]*net.MX{"xn--bcher-kva.example": {{Host: "mx.example.net.", Pref: 10}}},
+	}
+	p := collectZone(t, res, "bücher.example")
+	d := p.Domains[0]
+	if d.Domain != "bücher.example" {
+		t.Errorf("domain = %q, want it as configured", d.Domain)
+	}
+	if len(d.MX) != 1 || d.SPF.Record == nil || d.DMARC.Record == nil {
+		t.Errorf("mx = %v, spf = %s, dmarc = %s, want the records at xn--bcher-kva.example", d.MX, show(d.SPF.Record), show(d.DMARC.Record))
+	}
+	if e := d.Assessment.Enforced; e == nil || !*e {
+		t.Errorf("enforced = %s, want true", show(e))
+	}
+}
+
+func TestCollectListsADKIMRecordWithSpacesAroundEquals(t *testing.T) {
+	const record = "v=DKIM1; k=rsa; p = MIGfMA0GCSqGSIb3DQEBAQUAA4GN"
+	res := zoneResolver{txt: map[string][]string{"google._domainkey.spaced.example": {record}}}
+	p := collectZone(t, res, "spaced.example")
+	want := []DKIMRecord{{Selector: "google", Record: record, Valid: true}}
+	if got := p.Domains[0].DKIM; !reflect.DeepEqual(got, want) {
+		t.Errorf("dkim = %+v, want %+v", got, want)
+	}
+	if got := p.Summary.WithDkimCount; got == nil || *got != 1 {
+		t.Errorf("summary.with_dkim_count = %s, want 1", show(got))
+	}
+}
+
+func TestCollectListsADKIMRecordWithARepeatedTagAsInvalid(t *testing.T) {
+	const repeated = "v=DKIM1; k=rsa; k=rsa; p=MIGfMA0GCSqGSIb3DQEBAQUAA4GN"
+	res := zoneResolver{txt: map[string][]string{
+		"google._domainkey.repeated.example":  {repeated},
+		"default._domainkey.repeated.example": {"v=dkim1; k=rsa; p=MIGfMA0GCSqGSIb3DQEBAQUAA4GN"},
+	}}
+	p := collectZone(t, res, "repeated.example")
+	// A version other than DKIM1 leaves the default selector with no key
+	// record.
+	want := []DKIMRecord{{Selector: "google", Record: repeated, Valid: false}}
+	if got := p.Domains[0].DKIM; !reflect.DeepEqual(got, want) {
+		t.Errorf("dkim = %+v, want %+v", got, want)
+	}
+	if issues := p.Domains[0].Assessment.Issues; !slices.Contains(issues, "No valid DKIM records (all keys are malformed or revoked)") {
+		t.Errorf("issues = %v, want the one for no valid DKIM key", issues)
 	}
 }

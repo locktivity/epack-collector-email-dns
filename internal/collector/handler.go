@@ -55,6 +55,9 @@ func Run(ctx componentsdk.CollectorContext) error {
 		OnProgress: ctx.Progress,
 	})
 
+	componentsdk.Records(ctx).Targets(componentsdk.TargetDomain, componentsdk.Location{Path: ArtifactPath, Pointer: "/domains"}, "/domain").
+		ChosenBy(componentsdk.ChosenByConfig, "domains")
+
 	return ctx.Emit([]componentsdk.CollectedArtifact{
 		{
 			Data:   posture,

@@ -111,6 +111,7 @@ func TestCollectorKit(t *testing.T) {
 					kitResultPath: merged(
 						map[string]any{"/outcome": map[string]any{"status": "collected"}, "/gaps": []any{}},
 						kitStepPins(),
+						kitTargets("trust", true),
 					),
 				},
 			},
@@ -149,7 +150,7 @@ func TestCollectorKit(t *testing.T) {
 							"all_enforced":         false,
 						},
 					},
-					kitResultPath: {
+					kitResultPath: merged(map[string]any{
 						"/outcome": map[string]any{"status": "collected"},
 						"/gaps":    []any{},
 						"/calls/operations": []any{
@@ -158,7 +159,7 @@ func TestCollectorKit(t *testing.T) {
 							kitOperation("dns.mx.lookup", 4, map[string]any{"NXDOMAIN": 4}),
 							kitOperation("dns.spf.lookup", 4, map[string]any{"NOERROR": 1, "NXDOMAIN": 3}),
 						},
-					},
+					}, kitTargets("audit", true)),
 				},
 			},
 			{
@@ -199,6 +200,7 @@ func TestCollectorKit(t *testing.T) {
 							kitShareGaps("with_reporting", 1, "dns.dmarc.lookup", 9),
 							kitShareGaps("with_spf", 1, "dns.spf.lookup", 5),
 						)...),
+						kitTargets("audit", false),
 					),
 				},
 			},

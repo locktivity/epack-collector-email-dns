@@ -140,3 +140,20 @@ func kitGap(pointer, status string, unmeasured int, op string, call int) map[str
 	}
 	return g
 }
+
+// kitTargets pins the result's targets: the configured domains, with the
+// count the audit level adds and whether every domain was read in full.
+func kitTargets(level string, complete bool) map[string]any {
+	target := map[string]any{
+		"kind":       "domain",
+		"chosen_by":  "config_list",
+		"config_key": "domains",
+		"at":         map[string]any{"schema": ArtifactSchema, "path": ArtifactPath, "pointer": "/domains"},
+		"name":       []any{"/domain"},
+		"complete":   complete,
+	}
+	if level == "audit" {
+		target["count"] = len(kitDomains)
+	}
+	return map[string]any{"/targets": []any{target}}
+}

@@ -1,0 +1,69 @@
+{
+  "version": 1,
+  "vendor": "email-dns",
+  "source": "The TXT records terraform/main.tf writes, and checklist step 4, which keeps bare.email empty. The DKIM key stands in for the one Terraform generates, which stays in its state.",
+  "placeholders": {
+    "SANDBOX_DOMAIN": "example.com"
+  },
+  "email_dns": {
+    "domains": [
+      "enforced.email.example.com",
+      "monitor.email.example.com",
+      "malformed.email.example.com",
+      "bare.email.example.com"
+    ],
+    "names": {
+      "enforced.email.example.com": {
+        "txt": [
+          "v=spf1 -all"
+        ]
+      },
+      "_dmarc.enforced.email.example.com": {
+        "txt": [
+          "v=DMARC1; p=reject; rua=mailto:dmarc-reports@example.com"
+        ]
+      },
+      "s1._domainkey.enforced.email.example.com": {
+        "txt": [
+          "v=DKIM1; k=rsa; p=MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEApowQ5IRn1YbYl89MPh/b5wb5NVR2qW9RO9xhcGDToZiqtUlA2o7vLt7dBE3kFuyEwo1eTgAJpYi4HSJMAbPzGmxau5r/NOnj3PQrKFn/lYZnUzLQa56QiT9nXtec0VDMbRNfRBjg3LAlLvRW47HooATEWajCkcOW3nML2+Cc21PQ+pDjBduZJm6TTIi5SwHuq7xbJYSw5r6D2L89YL+TSDhctf/rHyKcb65DTvner2a1190+O0LDPCZRxtvXBSrOKyqFnwCSct+NXRMEa+XD5TwB+4vLQNHmUeZhn8SHvJE5UZdTDC1dvrDJzE87Y2E46SMCJe6SUuIIq5GEZgeF9wIDAQAB"
+        ]
+      },
+      "monitor.email.example.com": {
+        "txt": [
+          "v=spf1 ~all"
+        ]
+      },
+      "_dmarc.monitor.email.example.com": {
+        "txt": [
+          "v=DMARC1; p=none"
+        ]
+      },
+      "malformed.email.example.com": {
+        "txt": [
+          "v=spf1 ipv4:192.0.2.10 -all"
+        ]
+      },
+      "_dmarc.malformed.email.example.com": {
+        "txt": [
+          "v=DMARC1; p=quarentine"
+        ]
+      },
+      "example.com": {
+        "txt": [
+          "v=spf1 -all"
+        ]
+      },
+      "_dmarc.example.com": {
+        "txt": [
+          "v=DMARC1; p=reject; sp=reject"
+        ]
+      }
+    }
+  },
+  "terms": {
+    "dkim_selectors": {
+      "s1": "common"
+    }
+  }
+}
+

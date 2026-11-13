@@ -34,7 +34,7 @@ All metrics include enforcement status (whether DMARC is set to `p=reject`) and 
    - TXT records for SPF (v=spf1)
    - TXT records at `_dmarc.domain` for DMARC. When the domain has no DMARC record, the lookups continue above it, as the DNS tree walk in RFC 9989 does
    - TXT records at `selector._domainkey.domain` for common DKIM selectors
-3. Records are parsed and validated
+3. Records are parsed and validated. An SPF record is valid when it follows RFC 7208's grammar and its own terms cause no more than 10 DNS lookups. A DKIM selector with more than one key record has no valid key, since RFC 6376 leaves that case undefined
 4. Per-domain assessment is computed (enforced, has reporting, issues)
 5. Summary statistics are aggregated
 6. Output is wrapped in the epack collector protocol envelope

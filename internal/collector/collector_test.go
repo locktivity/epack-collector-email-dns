@@ -164,6 +164,8 @@ func TestValidateSPF(t *testing.T) {
 		{"v=spf1 ip6:not-an-address -all", false},
 		{"v=spf1 include: -all", false},
 		{"v=spf1 ~-all", false},
+		{"v=spf1 a mx ptr exists:x.example.com include:a.example include:b.example include:c.example include:d.example include:e.example include:f.example -all", true},                // 10 terms that cause lookups
+		{"v=spf1 a mx ptr exists:x.example.com include:a.example include:b.example include:c.example include:d.example include:e.example include:f.example redirect=g.example", false}, // 11, over RFC 7208's limit
 	}
 
 	for _, tt := range tests {

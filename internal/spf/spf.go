@@ -388,9 +388,13 @@ func (r Record) All() (byte, bool) {
 	return 0, false
 }
 
+// LookupLimit is RFC 7208 section 4.6.4's cap on the terms that cause DNS
+// lookups in one check. A check that needs more fails with permerror.
+const LookupLimit = 10
+
 // Lookups counts the terms that cost a DNS lookup when the record is
-// evaluated: include, a, mx, ptr, exists, and redirect. RFC 7208 section
-// 4.6.4 caps a check at 10, counting the terms of included records too.
+// evaluated: include, a, mx, ptr, exists, and redirect. LookupLimit caps a
+// check, counting the terms of included records too.
 func (r Record) Lookups() int {
 	n := 0
 	for _, m := range r.Mechanisms {

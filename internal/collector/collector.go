@@ -341,15 +341,20 @@ func (s *scanner) collectDKIM(ctx context.Context, domain string, result *Domain
 			continue
 		}
 
+		var keys []string
 		for _, txt := range txtRecords {
 			if isDKIMRecord(txt) {
-				records = append(records, DKIMRecord{
-					Selector: selector,
-					Record:   txt,
-					Valid:    validateDKIM(txt),
-				})
-				break
+				keys = append(keys, txt)
 			}
+		}
+		if len(keys) > 0 {
+			// RFC 6376 section 3.6.2.2 leaves a selector with more than one
+			// key record undefined, so none of them is a valid key.
+			records = append(records, DKIMRecord{
+				Selector: selector,
+				Record:   keys[0],
+				Valid:    len(keys) == 1 && validateDKIM(keys[0]),
+			})
 		}
 	}
 
@@ -359,13 +364,14 @@ func (s *scanner) collectDKIM(ctx context.Context, domain string, result *Domain
 	return failed, firstErr
 }
 
-// validateSPF reports whether an SPF record matches RFC 7208's grammar, since
-// receivers return permerror for a syntax error anywhere in it. A record
-// with no mechanism and no redirect or exp modifier, such as a bare v=spf1,
-// also reads as invalid.
+// validateSPF reports whether an SPF record matches RFC 7208's grammar and
+// keeps within its limit on lookups, since receivers return permerror for a
+// syntax error anywhere in it and for a record whose own terms already cause
+// more lookups than the limit. A record with no mechanism and no redirect or
+// exp modifier, such as a bare v=spf1, also reads as invalid.
 func validateSPF(record string) bool {
 	r, err := spf.Parse(record)
-	return err == nil && (len(r.Mechanisms) > 0 || r.Redirect != "" || r.Exp != "")
+	return err == nil && (len(r.Mechanisms) > 0 || r.Redirect != "" || r.Exp != "") && r.Lookups() <= spf.LookupLimit
 }
 
 // validateDKIM reports whether a DKIM key record's p tag holds key data.

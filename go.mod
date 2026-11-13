@@ -5,7 +5,7 @@ go 1.26.0
 toolchain go1.26.11
 
 require (
-	github.com/locktivity/epack v0.10.5
+	github.com/locktivity/epack v0.11.2
 	golang.org/x/net v0.60.0
 )
 

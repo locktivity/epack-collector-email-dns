@@ -144,11 +144,7 @@ func simMatrixAxes() []roster.Axis {
 
 // simMatrixAlone lists, by axis=value, the differences a setting shows on
 // its own.
-var simMatrixAlone = map[string]simulate.Differences{
-	"mx=two": simulate.Same(simulate.Unmodeled,
-		"Derive lists MX records in the roster's order. A resolver answers them by preference, and collectMX lists them by priority.",
-		"/domains/0/mx/0/host", "/domains/0/mx/0/priority", "/domains/0/mx/1/host", "/domains/0/mx/1/priority"),
-}
+var simMatrixAlone = map[string]simulate.Differences{}
 
 func TestSimulatedMatrix(t *testing.T) {
 	simHarness(simStanding).Matrix(t, simMatrixBase(t), simMatrixAxes(), simMatrixAlone, nil)
